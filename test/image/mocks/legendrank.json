@@ -44,10 +44,12 @@
         "size": 16
       }
     },
-    "legendgrouptitlesfont": {
-      "family": "Times New Roman",
-      "color": "orange",
-      "size": 14
+    "legend" : {
+      "grouptitlesfont": {
+        "family": "Times New Roman",
+        "color": "orange",
+        "size": 14
+      }
     },
     "margin": {
       "t": 50,

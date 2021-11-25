@@ -28,6 +28,8 @@ var plots = module.exports = {};
 // Expose registry methods on Plots for backward-compatibility
 Lib.extendFlat(plots, Registry);
 
+var legendAttributes = require('../components/legend/attributes');
+
 plots.attributes = require('./attributes');
 plots.attributes.type.values = plots.allTypes;
 plots.fontAttrs = require('./font_attributes');
@@ -1323,7 +1325,7 @@ plots.supplyTraceDefaults = function(traceIn, traceOut, colorIndex, layout, trac
             coerce('legendgroup');
             var titleText = coerce('legendgrouptitle.text');
             if(titleText) {
-                Lib.coerceFont(coerce, 'legendgrouptitle.font', layout.legendgrouptitlesfont);
+                Lib.coerceFont(coerce, 'legendgrouptitle.font', layout.legend.grouptitlesfont);
             }
 
             coerce('legendrank');
@@ -1464,6 +1466,10 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut, formatObj) {
         return Lib.coerce(layoutIn, layoutOut, plots.layoutAttributes, attr, dflt);
     }
 
+    function legendCoerce(attr, dflt) {
+        return Lib.coerce(layoutIn, layoutOut, {legend: legendAttributes}, attr, dflt);
+    }
+
     var template = layoutIn.template;
     if(Lib.isPlainObject(template)) {
         layoutOut.template = template;
@@ -1476,7 +1482,7 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut, formatObj) {
     var font = Lib.coerceFont(coerce, 'font');
     var fontSize = font.size;
 
-    Lib.coerceFont(coerce, 'legendgrouptitlesfont', Lib.extendFlat({}, font, {
+    Lib.coerceFont(legendCoerce, 'legend.grouptitlesfont', Lib.extendFlat({}, font, {
         size: Math.round(fontSize * 1.1)
     }));
 
