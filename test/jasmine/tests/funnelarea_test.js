@@ -722,7 +722,7 @@ describe('funnelarea hovering', function() {
                 'data', 'fullData',
                 'label', 'color', 'value',
                 'percent', 'text',
-                'bbox'
+                'bbox', 'xPixel', 'yPixel'
             ];
 
             expect(typeof hoverData.points[0].bbox).toEqual('object');

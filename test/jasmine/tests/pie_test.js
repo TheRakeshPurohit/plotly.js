@@ -1032,7 +1032,7 @@ describe('pie hovering', function() {
                 'data', 'fullData',
                 'label', 'color', 'value',
                 'i', 'v', 'percent', 'text',
-                'bbox'
+                'bbox', 'xPixel', 'yPixel'
             ];
 
             expect(typeof hoverData.points[0].bbox).toEqual('object');
