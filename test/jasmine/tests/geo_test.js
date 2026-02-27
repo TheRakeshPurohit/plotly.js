@@ -1792,7 +1792,7 @@ describe('Test event property of interactions on a geo plot:', function() {
             expect(Object.keys(pt).sort()).toEqual([
                 'data', 'fullData', 'curveNumber', 'pointNumber', 'pointIndex', 'bbox',
                 'lon', 'lat',
-                'location', 'text', 'marker.size'
+                'location', 'text', 'marker.size', 'xPixel', 'yPixel'
             ].sort());
 
             expect(pt.curveNumber).toEqual(0, 'points[0].curveNumber');
@@ -1896,7 +1896,7 @@ describe('Test event property of interactions on a geo plot:', function() {
             expect(Object.keys(pt).sort()).toEqual([
                 'data', 'fullData', 'curveNumber', 'pointNumber', 'pointIndex', 'bbox',
                 'lon', 'lat',
-                'location', 'text', 'marker.size'
+                'location', 'text', 'marker.size', 'xPixel', 'yPixel'
             ].sort());
 
             expect(pt.curveNumber).toEqual(0, 'points[0].curveNumber');
