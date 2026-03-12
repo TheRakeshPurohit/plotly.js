@@ -59,7 +59,7 @@ describe('hoveranywhere', function() {
         .then(done, done.fail);
     });
 
-    it('does not fire on empty space by default', function(done) {
+    it('does not emit plotly_hover event on empty space when hoveranywhere is false', function(done) {
         var hoverData;
 
         makePlot(gd).then(function() {
