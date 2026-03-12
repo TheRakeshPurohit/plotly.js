@@ -167,6 +167,8 @@ exports.loneHover = function loneHover(hoverItems, opts) {
                 y1: y1 + gTop
             };
 
+            // xPixel/yPixel are pixel coordinates of the hover point's center,
+            // relative to the top-left corner of the graph div
             eventData.xPixel = (_x0 + _x1) / 2;
             eventData.yPixel = (_y0 + _y1) / 2;
 
@@ -477,10 +479,12 @@ function _hover(gd, evt, subplot, noHoverEvent, eventTarget) {
     }
 
     // Save coordinate values so clickanywhere can be used without hoveranywhere
-    gd._hoverXVals = xvalArray;
-    gd._hoverYVals = yvalArray;
-    gd._hoverXAxes = xaArray;
-    gd._hoverYAxes = yaArray;
+    if (fullLayout.clickanywhere) {
+        gd._hoverXVals = xvalArray;
+        gd._hoverYVals = yvalArray;
+        gd._hoverXAxes = xaArray;
+        gd._hoverYAxes = yaArray;
+    }
 
     // the pixel distance to beat as a matching point
     // in 'x' or 'y' mode this resets for each trace
@@ -789,14 +793,15 @@ function _hover(gd, evt, subplot, noHoverEvent, eventTarget) {
         }
 
         if (fullLayout.hoveranywhere && !noHoverEvent && eventTarget) {
-            gd.emit('plotly_hover', {
-                event: evt,
-                points: [],
-                xaxes: xaArray,
-                yaxes: yaArray,
-                xvals: xvalArray,
-                yvals: yvalArray
-            });
+            var oldHoverData = gd._hoverdata;
+            if (oldHoverData && oldHoverData.length) {
+                gd.emit('plotly_unhover', {
+                    event: evt,
+                    points: oldHoverData
+                });
+                gd._hoverdata = [];
+            }
+            emitHover([]);
         }
         return result;
     }
@@ -947,14 +952,18 @@ function _hover(gd, evt, subplot, noHoverEvent, eventTarget) {
         });
     }
 
-    gd.emit('plotly_hover', {
-        event: evt,
-        points: gd._hoverdata,
-        xaxes: xaArray,
-        yaxes: yaArray,
-        xvals: xvalArray,
-        yvals: yvalArray
-    });
+    emitHover(gd._hoverdata);
+
+    function emitHover(points) {
+        gd.emit('plotly_hover', {
+            event: evt,
+            points: points,
+            xaxes: xaArray,
+            yaxes: yaArray,
+            xvals: xvalArray,
+            yvals: yvalArray
+        });
+    }
 }
 
 function hoverDataKey(d) {
