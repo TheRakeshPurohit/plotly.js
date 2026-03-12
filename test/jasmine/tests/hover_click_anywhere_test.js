@@ -121,7 +121,7 @@ describe('clickanywhere', function() {
         .then(done, done.fail);
     });
 
-    it('does not fire on empty space by default', function(done) {
+    it('does not emit plotly_click event on empty space when clickanywhere is false', function(done) {
         var clickData;
 
         makePlot(gd).then(function() {
