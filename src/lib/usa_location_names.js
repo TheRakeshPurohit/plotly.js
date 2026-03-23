@@ -1,7 +1,7 @@
 'use strict';
 
 // Mapping of lowercase full US state names to two-letter abbreviations
-export const usaLocationList = {
+const usaLocationList = {
     alabama: 'AL',
     alaska: 'AK',
     arizona: 'AZ',
@@ -57,4 +57,9 @@ export const usaLocationList = {
     wyoming: 'WY'
 };
 
-export const usaLocationAbbreviations = new Set(Object.values(usaLocationList));
+const usaLocationAbbreviations = new Set(Object.values(usaLocationList));
+
+module.exports = {
+    usaLocationAbbreviations,
+    usaLocationList
+};
