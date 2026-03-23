@@ -221,6 +221,12 @@ var configAttributes = {
         ].join(' ')
     },
 
+    displayNotifier: {
+        valType: 'boolean',
+        dflt: true,
+        description: 'Determines whether or not notifier is displayed.'
+    },
+
     showLink: {
         valType: 'boolean',
         dflt: false,
@@ -467,12 +473,12 @@ var configAttributes = {
 var dfltConfig = {};
 
 function crawl(src, target) {
-    for(var k in src) {
+    for (var k in src) {
         var obj = src[k];
-        if(obj.valType) {
+        if (obj.valType) {
             target[k] = obj.dflt;
         } else {
-            if(!target[k]) {
+            if (!target[k]) {
                 target[k] = {};
             }
             crawl(obj, target[k]);
