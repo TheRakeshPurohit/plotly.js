@@ -11,13 +11,14 @@ var loggers = require('./loggers');
 var isPlainObject = require('./is_plain_object');
 var nestedProperty = require('./nested_property');
 var polygon = require('./polygon');
+const { usaLocationAbbreviations, usaLocationList } = require('./usa_location_names');
 
 // make list of all country iso3 ids from at runtime
 var countryIds = Object.keys(countryRegex);
 
 var locationmodeToIdFinder = {
     'ISO-3': identity,
-    'USA-states': identity,
+    'USA-states': usaLocationToAbbreviation,
     'country names': countryNameToISO3
 };
 
@@ -34,14 +35,25 @@ function countryNameToISO3(countryName) {
     return false;
 }
 
+function usaLocationToAbbreviation(loc) {
+    loc = loc.trim();
+    const abbreviation = usaLocationAbbreviations.has(loc.toUpperCase())
+        ? loc.toUpperCase()
+        : usaLocationList[loc.toLowerCase()];
+
+    if (abbreviation) return abbreviation;
+
+    loggers.log('Unrecognized US location: ' + loc + '.');
+
+    return false;
+}
+
 function locationToFeature(locationmode, location, features) {
     if (!location || typeof location !== 'string') return false;
 
-    var locationId = locationmodeToIdFinder[locationmode](location);
-    var filteredFeatures;
-    var f, i;
-
+    const locationId = locationmodeToIdFinder[locationmode](location);
     if (locationId) {
+        let filteredFeatures;
         if (locationmode === 'USA-states') {
             // Filter out features out in USA
             //
@@ -50,24 +62,18 @@ function locationToFeature(locationmode, location, features) {
             // which have some overlay in their two-letter ids. For example,
             // 'WA' is used for both Washington state and Western Australia.
             filteredFeatures = [];
-            for (i = 0; i < features.length; i++) {
-                f = features[i];
-                if (f.properties && f.properties.gu && f.properties.gu === 'USA') {
-                    filteredFeatures.push(f);
-                }
+            for (const f of features) {
+                if (f?.properties?.gu === 'USA') filteredFeatures.push(f);
             }
         } else {
             filteredFeatures = features;
         }
 
-        for (i = 0; i < filteredFeatures.length; i++) {
-            f = filteredFeatures[i];
+        for (const f of filteredFeatures) {
             if (f.id === locationId) return f;
         }
 
-        loggers.log(
-            ['Location with id', locationId, 'does not have a matching topojson feature at this resolution.'].join(' ')
-        );
+        loggers.log(`Location with id ${locationId} does not have a matching topojson feature at this resolution.`);
     }
 
     return false;
