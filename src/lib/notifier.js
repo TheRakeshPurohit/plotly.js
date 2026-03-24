@@ -13,15 +13,15 @@ var NOTEDATA = [];
  * @param {object} [gd] - Plot div; if provided and gd._context.displayNotifier === false, notification is suppressed
  * @return {undefined} this function does not return a value
  */
-module.exports = function (text, displayLength, gd) {
-    if (gd && gd._context && gd._context.displayNotifier === false) return;
-    if (NOTEDATA.indexOf(text) !== -1) return;
+module.exports = function(text, displayLength, gd) {
+    if(gd && gd._context && gd._context.displayNotifier === false) return;
+    if(NOTEDATA.indexOf(text) !== -1) return;
 
     NOTEDATA.push(text);
 
     var ts = 1000;
-    if (isNumeric(displayLength)) ts = displayLength;
-    else if (displayLength === 'long') ts = 3000;
+    if(isNumeric(displayLength)) ts = displayLength;
+    else if(displayLength === 'long') ts = 3000;
 
     var notifierContainer = d3.select('body')
         .selectAll('.plotly-notifier')
@@ -36,9 +36,9 @@ module.exports = function (text, displayLength, gd) {
         transition
             .duration(700)
             .style('opacity', 0)
-            .each('end', function (thisText) {
+            .each('end', function(thisText) {
                 var thisIndex = NOTEDATA.indexOf(thisText);
-                if (thisIndex !== -1) NOTEDATA.splice(thisIndex, 1);
+                if(thisIndex !== -1) NOTEDATA.splice(thisIndex, 1);
                 d3.select(this).remove();
             });
     }
@@ -46,24 +46,24 @@ module.exports = function (text, displayLength, gd) {
     notes.enter().append('div')
         .classed('notifier-note', true)
         .style('opacity', 0)
-        .each(function (thisText) {
+        .each(function(thisText) {
             var note = d3.select(this);
 
             note.append('button')
                 .classed('notifier-close', true)
                 .html('&times;')
-                .on('click', function () {
+                .on('click', function() {
                     note.transition().call(killNote);
                 });
 
             var p = note.append('p');
             var lines = thisText.split(/<br\s*\/?>/g);
-            for (var i = 0; i < lines.length; i++) {
-                if (i) p.append('br');
+            for(var i = 0; i < lines.length; i++) {
+                if(i) p.append('br');
                 p.append('span').text(lines[i]);
             }
 
-            if (displayLength === 'stick') {
+            if(displayLength === 'stick') {
                 note.transition()
                     .duration(350)
                     .style('opacity', 1);
