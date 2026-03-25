@@ -14,7 +14,7 @@ var NOTEDATA = [];
  * @return {undefined} this function does not return a value
  */
 module.exports = function(text, displayLength, gd) {
-    if(gd && gd._context && gd._context.displayNotifier === false) return;
+    if(gd?._context?.displayNotifier === false) return;
     if(NOTEDATA.indexOf(text) !== -1) return;
 
     NOTEDATA.push(text);
