@@ -1,7 +1,7 @@
 # Contributing to Plotly.js
 
 Thanks for your interest in contributing to Plotly.js! We are actively looking for
-diverse contributors, with diverse background and skills.
+diverse contributors, with diverse backgrounds and skills.
 
 This document outlines the general way that changes get made to this library and by whom,
 and then provides specific technical information about how to set up a development
@@ -79,12 +79,12 @@ We use the following [labels](https://github.com/plotly/plotly.js/labels) to tra
 - git
 - [node.js](https://nodejs.org/en/). We recommend using node.js v18.x.
   Upgrading and managing node versions can be easily done using
-  [`nvm`](https://github.com/creationix/nvm) or its Windows alternatives.
+  [`nvm`](https://github.com/nvm-sh/nvm) or its Windows alternatives.
 - [`npm`](https://www.npmjs.com/) v10.x and up to ensure that the
   [`package-lock.json`](https://docs.npmjs.com/files/package-lock.json) file is
   used and updated correctly.
 - [`python3`](https://www.python.org/downloads/)
-Note: for M1 mac users specifically, you might need to install some [extra dependencies](https://github.com/Automattic/node-canvas/issues/1733#issuecomment-761703018). 
+Note: For M1 Mac users specifically, you might need to install some [extra dependencies](https://github.com/Automattic/node-canvas/issues/1733#issuecomment-761703018). 
 
 #### Step 1: Fork the plotly.js repository, clone your fork and step into it
 
@@ -332,7 +332,7 @@ This will produce the following plot, and say you want to simulate a selection p
 - Sources files are in `src/`
 - Build and repo management scripts are in `tasks/`
 - All tasks can be run using [`npm run-script`](https://docs.npmjs.com/cli/run-script)
-- Tests are `test/`, they are partitioned into `image` and `jasmine` tests
+- Tests are in `test/`; they are partitioned into `image` and `jasmine` tests
 - Test dashboard and image viewer code is in `devtools/`
 - Built files are in `build/` (the files in here are git-ignored, except for `plotcss.js`)
 
@@ -384,10 +384,10 @@ Other methods used by some trace modules:
   selections.
 - `_module.convert`: Sometimes separated from `_module.plot` or `_module.calc` to convert the
   plotly.js settings to another framework e.g. to `gl-plot3d` for `gl3d` traces, to
-  `mapbox-gl` from `mapbox` traces. This split can make the logic easier to test.
+  `mapbox-gl` for `mapbox` traces. This split can make the logic easier to test.
   If you make a `convert`, you should call it from either `calc` or `plot`.
 
 ## Coding style
 
-Check if ok, with `npm run lint`
+Check if OK with `npm run lint`
 
