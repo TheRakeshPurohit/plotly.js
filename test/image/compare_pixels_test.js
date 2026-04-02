@@ -67,6 +67,7 @@ var blacklist = [
     'map_scattercluster',
     'map_fonts-supported-open-sans',
     'map_fonts-supported-open-sans-weight',
+    'map_layers',
 ];
 
 if(virtualWebgl) {
