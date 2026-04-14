@@ -24,9 +24,9 @@ jobs:
   install-and-cibuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -42,7 +42,7 @@ jobs:
       - name: CI-Build
         run: npm run cibuild
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: build-output
           retention-days: 3
@@ -58,7 +58,7 @@ jobs:
     needs: install-and-cibuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
 
@@ -102,7 +102,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 4
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
 
@@ -123,7 +123,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 8
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
 
@@ -144,7 +144,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 8
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
 
@@ -165,7 +165,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 8
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
         with:
@@ -184,7 +184,7 @@ jobs:
       SHARD_INDEX: 0
       SHARD_TOTAL: 1
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
 
@@ -199,7 +199,7 @@ jobs:
     env:
       TZ: 'America/Anchorage'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
 
@@ -214,10 +214,10 @@ jobs:
     env:
       TZ: 'America/Anchorage'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
-      - uses: browser-actions/setup-firefox@v1
+      - uses: browser-actions/setup-firefox@fcf821c621167805dd63a29662bd7cb5676c81a8 # v1
 
       - name: Test MathJax on firefox-latest
         uses: ./.github/actions/run-xvfb
@@ -231,14 +231,14 @@ jobs:
     needs: install-and-cibuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
       - uses: ./.github/actions/setup-chrome
         with:
           chrome-version: 'stable'
 
       - name: Run noCI tests
-        uses: coactions/setup-xvfb@v1
+        uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3 # v1
         with:
           run: ./tasks/noci_test.sh jasmine
 
@@ -256,7 +256,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 12
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - uses: ./.github/actions/setup-image-env
@@ -264,7 +264,7 @@ jobs:
       - name: Create all png files
         run: .github/scripts/test.sh make-baselines
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: baselines-default-${{ matrix.shard }}
           retention-days: 3
@@ -274,10 +274,10 @@ jobs:
     needs: make-baselines
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           pattern: baselines-default-*
           path: build/test_images/
@@ -299,7 +299,7 @@ jobs:
           echo "Download the baseline images from the artifacts of this workflow run."
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: baselines-default-diff
@@ -319,7 +319,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 12
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - uses: ./.github/actions/setup-image-env
@@ -327,7 +327,7 @@ jobs:
       - name: Create all png files (b64)
         run: .github/scripts/test.sh make-baselines-b64
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: baselines-b64-${{ matrix.shard }}
           retention-days: 3
@@ -337,10 +337,10 @@ jobs:
     needs: make-baselines-b64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           pattern: baselines-b64-*
           path: build/test_images/
@@ -355,7 +355,7 @@ jobs:
           echo "Download the baseline images from the artifacts of this workflow run."
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: baselines-b64-diff
@@ -375,7 +375,7 @@ jobs:
       SHARD_INDEX: ${{ matrix.shard }}
       SHARD_TOTAL: 8
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - uses: ./.github/actions/setup-image-env
@@ -383,7 +383,7 @@ jobs:
       - name: Create png files (virtual-webgl)
         run: .github/scripts/test.sh make-baselines-virtual-webgl
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: baselines-virtual-webgl-${{ matrix.shard }}
           retention-days: 3
@@ -393,10 +393,10 @@ jobs:
     needs: make-baselines-virtual-webgl
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           pattern: baselines-virtual-webgl-*
           path: build/test_images/
@@ -411,7 +411,7 @@ jobs:
           echo "Download the baseline images from the artifacts of this workflow run."
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: baselines-virtual-webgl-diff
@@ -424,7 +424,7 @@ jobs:
     needs: install-and-cibuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - uses: ./.github/actions/setup-image-env
@@ -432,7 +432,7 @@ jobs:
       - name: Create mathjax v3 png files
         run: .github/scripts/test.sh make-baselines-mathjax3
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: baselines-mathjax3
           retention-days: 3
@@ -442,10 +442,10 @@ jobs:
     needs: make-baselines-mathjax3
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: baselines-mathjax3
           path: build/test_images/
@@ -460,7 +460,7 @@ jobs:
           echo "Download the baseline images from the artifacts of this workflow run."
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: baselines-mathjax3-diff
@@ -476,7 +476,7 @@ jobs:
     needs: install-and-cibuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - uses: ./.github/actions/setup-image-env
@@ -489,7 +489,7 @@ jobs:
       - name: Create svg, jpg, jpeg, webp, pdf and eps files
         run: .github/scripts/test.sh make-exports
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: exports
           retention-days: 3
@@ -499,17 +499,17 @@ jobs:
     needs: make-exports
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: exports
           path: build/
 
       - name: Test export sizes
         run: node test/image/export_test.js
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: exports-diff
@@ -523,7 +523,7 @@ jobs:
     needs: install-and-cibuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - name: Test validation using node.js and jsdom
@@ -536,7 +536,7 @@ jobs:
     needs: install-and-cibuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-workspace
 
       - name: Run syntax tests on source files
@@ -548,12 +548,12 @@ jobs:
   publish-dist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -575,7 +575,7 @@ jobs:
       - name: Build dist/
         run: npm run build
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: dist-node18
           retention-days: 7
@@ -594,7 +594,7 @@ jobs:
           version=$(node --eval "console.log(require('./package.json').version)")
           mv plotly.js-$version.tgz plotly.js.tgz
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: tarball-node18
           retention-days: 7
@@ -606,12 +606,12 @@ jobs:
   publish-dist-node-v22:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: '22.14.0'
           cache: 'npm'
@@ -633,7 +633,7 @@ jobs:
       - name: Build dist/
         run: npm run build
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: dist-node22
           retention-days: 7
@@ -652,7 +652,7 @@ jobs:
           version=$(node --eval "console.log(require('./package.json').version)")
           mv plotly.js-$version.tgz plotly.js.tgz
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: tarball-node22
           retention-days: 7
@@ -664,9 +664,9 @@ jobs:
   test-stackgl-bundle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -680,7 +680,7 @@ jobs:
       - name: Test stackgl_modules/index.js diff
         run: diff --unified --color stackgl_modules/INDEX.js stackgl_modules/index.js
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: stackgl-bundle
@@ -691,9 +691,9 @@ jobs:
     if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -707,7 +707,7 @@ jobs:
       - name: Compare existing files with newly built files
         run: diff -qr topojson/dist topojson/dist_backup
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
         with:
           name: topojson-dist
