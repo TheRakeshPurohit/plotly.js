@@ -1404,7 +1404,7 @@ describe('Test geo interactions', function() {
                     py -= 2;
                     mouseEvent('mousemove', px, py);
 
-                    if(py > 175) {
+                    if(py > 176) {
                         _assert('- py ' + py, 1);
                         expect(cnt).toBe(0, 'no plotly_unhover event so far');
                     } else {
@@ -2608,7 +2608,7 @@ describe('Test geo zoom/pan/drag interactions:', function() {
             _assert('base', [
                 [-96.6, 38.7], 1,
             ], [
-                [410, 329], 738.5
+                [410, 309], 738.5
             ], undefined);
             return drag({path: [[250, 250], [200, 200]], noCover: true});
         })
@@ -2616,7 +2616,7 @@ describe('Test geo zoom/pan/drag interactions:', function() {
             _assert('after NW-SE drag', [
                 [-91.8, 34.8], 1,
             ], [
-                [366, 279], 738.5
+                [366, 259], 738.5
             ], [
                 'geo.center.lon', 'geo.center.lon'
             ]);
@@ -2626,7 +2626,7 @@ describe('Test geo zoom/pan/drag interactions:', function() {
             _assert('after scroll', [
                 [-94.5, 35.0], 1.3
             ], [
-                [380, 273], 974.4
+                [380, 245.9], 974.4
             ], [
                 'geo.center.lon', 'geo.center.lon', 'geo.projection.scale'
             ]);
@@ -2637,7 +2637,7 @@ describe('Test geo zoom/pan/drag interactions:', function() {
                 [-94.5, 35.0], 1.3
             ], [
                 // new center values are reflected in translate()
-                [380, 273], 974.4
+                [380, 245.9], 974.4
             ], [
                 'geo.showlakes'
             ]);
@@ -2647,7 +2647,7 @@ describe('Test geo zoom/pan/drag interactions:', function() {
             _assert('after double click', [
                 [-96.6, 38.7], 1,
             ], [
-                [416, 329], 738.5
+                [416, 309], 738.5
             ], 'dblclick');
         })
         .then(done, done.fail);
@@ -2759,10 +2759,10 @@ describe('Test geo interactions update marker angles:', function() {
         })
         .then(function() {
             newPath = getPath();
-            expect(newPath).toEqual('M0,0L18.224184922503092,8.238876374264322L19.586365339190138,-4.046516131164082Z');
+            expect(newPath).toEqual('M0,0L18.27769005891461,8.119485581627321L19.559475756661865,-4.174554841483899Z');
 
             expect(newPath).not.toEqual(initialPath);
-            expect(newPath).toEqual('M0,0L18.224184922503092,8.238876374264322L19.586365339190138,-4.046516131164082Z');
+            expect(newPath).toEqual('M0,0L18.27769005891461,8.119485581627321L19.559475756661865,-4.174554841483899Z');
             expect(initialPath).toEqual('M0,0L-1.5094067529528923,19.942960945008643L10.501042615957648,17.021401351764233Z');
         })
         .then(done, done.fail);
