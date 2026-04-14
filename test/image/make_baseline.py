@@ -70,16 +70,12 @@ if len(args) > 0:
 else:
     allNames = ALL_MOCKS
 
-# unable to generate baselines for the following mocks
-blacklist = [
-    "map_stamen-style",
-    "map_predefined-styles2",
-    "map_scattercluster",
-    "map_fonts-supported-open-sans",
-    "map_fonts-supported-open-sans-weight",
-    "map_layers",
-]
-allNames = [a for a in allNames if a not in blacklist]
+with open(
+    os.path.join(root, "test", "image", "compare_pixels_collections.json"), "r"
+) as f:
+    # unable to generate baselines for the following mocks
+    disallowList = set(json.load(f)["compare_disallow"])
+allNames = [a for a in allNames if a not in disallowList]
 
 if len(allNames) == 0:
     print("error: Nothing to create!")
@@ -90,6 +86,8 @@ for name in allNames:
     outName = name
     if mathjax_version == 3:
         outName = "mathjax3___" + name
+    if virtual_webgl_version == 1:
+        outName = "virtual-webgl___" + outName
 
     print(outName)
 

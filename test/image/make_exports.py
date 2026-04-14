@@ -14,21 +14,21 @@ allFormats = ["svg", "jpg", "jpeg", "webp", "pdf"]
 # 'png' is tested by image-test
 
 allNames = [
-    "plot_types",
     "annotations",
-    "shapes",
-    "range_slider",
     "contour_legend-colorscale",
-    "layout_image",
-    "image_astronaut_source",
+    "fonts",
     "gl2d_no-clustering2",
     "gl3d_surface-heatmap-treemap_transparent-colorscale",
+    "image_astronaut_source",
+    "layout_image",
     "map_density-multiple_legend",
-    "smith_modes",
-    "zsmooth_methods",
-    "fonts",
-    "worldcup",
     "mathjax",
+    "plot_types",
+    "range_slider",
+    "shapes",
+    "smith_modes",
+    "worldcup",
+    "zsmooth_methods",
 ]
 
 failed = 0
