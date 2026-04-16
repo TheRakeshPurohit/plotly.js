@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# GitHub Actions version of .circleci/test.sh
-# Replaces `circleci tests split` with split_files.mjs
-
 set +e
 set +o pipefail
 

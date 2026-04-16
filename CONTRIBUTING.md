@@ -186,8 +186,8 @@ compliance, and so for strict builds we pre-generate regl shader code here.
 
 ## Testing
 
-Both jasmine and image tests are run on
-[CircleCI](https://circleci.com/gh/plotly/plotly.js) on every push to this
+Both Jasmine and image tests are run on
+[GitHub Actions](https://github.com/plotly/plotly.js/actions/workflows/ci.yml) on every push to this
 repo.
 
 ### Jasmine tests
@@ -240,30 +240,31 @@ npm run test-jasmine -- --info
 ```
 
 ### Draft new baselines
-#### With docker:
-> If you prefer using docker each time you need to
+
+#### With Docker:
 ```sh
-docker run -it -v "$(pwd)":/plotly.js circleci/python:3.8.9 bash
-# then inside the docker
-cd plotly.js
-sudo bash .circleci/env_image.sh
+docker run -it -v "$(pwd)":/plotly.js python:3.12 bash
+# Then inside the container
+cd /plotly.js
+pip install uv
+bash .github/scripts/env_image.sh
 ```
 
-#### Without docker:
-> Otherwise you may need to install `python 3.8`
-Then upgrade `pip` if needed
+#### Without Docker:
+Ensure you have Python 3.12+ and [`uv`](https://docs.astral.sh/uv/) installed.
+
+To install required fonts and tools, run the [setup script](https://github.com/plotly/plotly.js/blob/master/.github/scripts/env_image.sh):
 ```sh
-python3 -m pip install --upgrade pip
+bash .github/scripts/env_image.sh
 ```
 
-To install required fonts and tools see this [shell script](https://github.com/plotly/plotly.js/blob/master/.circleci/env_image.sh).
+#### Scripts to generate/update new baselines with/without Docker:
 
-#### Scripts to generate/update new baselines with/without docker:
 ```sh
 python3 test/image/make_baseline.py = mock_1 mock_2
 ```
 
-> Alternatively using npm & node.js (which are not available in the python docker by default)
+Alternatively, you can use Node:
 
 ```sh
 npm run baseline mock_1 mock_2
@@ -287,10 +288,11 @@ If you added new mocks to test/image/mocks folder, to generate draft baselines r
 ```sh
 python3 test/image/make_baseline.py = mockFilename1 mockFilename2
 ```
+
 Then commit the new baselines and push.
-Please note that image pixel comparison tests run using circleci/python:3.8.9 docker container.
+Please note that image pixel comparison tests run on `ubuntu-latest` in GitHub Actions.
 Therefore the final baselines may need updates.
-This could simply be done by downloading the `baselines.tar` stored in the `ARTIFACTS` tab of `test-baselines` job (if the test failed).
+This could simply be done by downloading the baseline images from the **Artifacts** section of the `test-baselines` job in the failed workflow run.
 
 ### Using the developer console in karma to write/debug jasmine tests
 
@@ -390,4 +392,3 @@ Other methods used by some trace modules:
 ## Coding style
 
 Check if OK with `npm run lint`
-
