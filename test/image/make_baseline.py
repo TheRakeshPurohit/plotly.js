@@ -74,7 +74,7 @@ with open(
     os.path.join(root, "test", "image", "compare_pixels_collections.json"), "r"
 ) as f:
     # unable to generate baselines for the following mocks
-    disallowList = set(json.load(f)["compare_disallow"])
+    disallowList = set(json.load(f)["disallow"])
 allNames = [a for a in allNames if a not in disallowList]
 
 if len(allNames) == 0:
@@ -86,8 +86,6 @@ for name in allNames:
     outName = name
     if mathjax_version == 3:
         outName = "mathjax3___" + name
-    if virtual_webgl_version == 1:
-        outName = "virtual-webgl___" + outName
 
     print(outName)
 

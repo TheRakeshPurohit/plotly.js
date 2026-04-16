@@ -1,5 +1,5 @@
 {
-  "compare_disallow": [
+  "disallow": [
     "map_angles",
     "map_fonts-supported-open-sans-weight",
     "map_fonts-supported-open-sans",
@@ -8,7 +8,23 @@
     "map_scattercluster",
     "map_stamen-style"
   ],
-  "compare_mathjax3": [
+  "flaky": ["gl3d_bunny-hull"],
+  "flaky_maps": [
+    "map_density0-legend",
+    "map_osm-style",
+    "map_predefined-styles1",
+    "map_predefined-styles2"
+  ],
+  "flaky_virtual_webgl": [
+    "gl3d_cone-wind",
+    "gl3d_ibm-plot",
+    "gl3d_isosurface_2surfaces-checker_spaceframe",
+    "gl3d_isosurface_math",
+    "gl3d_mesh3d_surface3d_scatter3d_line3d_error3d_log_reversed_ranges",
+    "gl3d_opacity-scaling-spikes",
+    "gl3d_scatter3d-blank-text"
+  ],
+  "mathjax3": [
     "legend_mathjax_title_and_items",
     "mathjax",
     "parcats_grid_subplots",

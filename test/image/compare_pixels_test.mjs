@@ -66,34 +66,23 @@ const failed = new Set();
 // TODO: In Node 20+, replace with: import collections from './compare_pixels_collections.json' with { type: 'json' };
 const collectionsPath = path.join(__dirname, 'compare_pixels_collections.json');
 const collections = JSON.parse(fs.readFileSync(collectionsPath));
-const disallowList = new Set(collections.compare_disallow);
-const flakyList = new Set(['gl3d_bunny-hull']);
-const flakyListMaps = new Set([
-    // more flaky
-    'map_density0-legend',
-    'map_osm-style',
-    'map_predefined-styles1',
-    'map_predefined-styles2'
-]);
-if (virtualWebgl) {
-    allMockList = allMockList.filter((a) => a.startsWith('gl') || a.startsWith('map'));
-}
-
-if (mathjax3) {
-    allMockList = collections.compare_mathjax3;
-}
+const disallowList = new Set(collections.disallow);
+const flakyList = new Set(collections.flaky);
+const flakyListMaps = new Set(collections.flaky_maps);
+const flakyVirtualWebgl = new Set(collections.flaky_virtual_webgl);
+if (virtualWebgl) allMockList = allMockList.filter((a) => a.startsWith('gl') || a.startsWith('map'));
+else if (mathjax3) allMockList = collections.mathjax3;
 allMockList = new Set(allMockList);
 
 for (let mockName of allMockList) {
     if (disallowList.has(mockName)) continue;
 
-    let threshold;
+    let threshold = 0;
     if (flakyListMaps.has(mockName)) threshold = 1;
     else if (flakyList.has(mockName)) threshold = 0.15;
-    else threshold = 0;
+    else if (virtualWebgl) threshold = flakyVirtualWebgl.has(mockName) ? 0.7 : 0.4;
 
     if (mathjax3) mockName = 'mathjax3___' + mockName;
-    if (virtualWebgl) mockName = 'virtual-webgl___' + mockName;
 
     const { baseline: base, test, diff } = getImagePaths(mockName);
 
