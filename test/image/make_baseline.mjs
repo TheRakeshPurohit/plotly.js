@@ -1,8 +1,10 @@
-var minimist = require('minimist');
-var path = require('path');
-var spawn = require('child_process').spawn;
+import { spawn } from 'child_process';
+import { readFileSync } from 'fs';
+import minimist from 'minimist';
+import path from 'path';
+import getMockList from './assets/get_mock_list.js';
 
-var getMockList = require('./assets/get_mock_list');
+const collections = JSON.parse(readFileSync(new URL('./compare_pixels_collections.json', import.meta.url)));
 
 /**
  *  Baseline image generation script.
@@ -35,48 +37,36 @@ var getMockList = require('./assets/get_mock_list');
  *
  */
 
-var argv = minimist(process.argv.slice(2), {});
+const argv = minimist(process.argv.slice(2), {});
 
-var allMockList = [];
-var mathjax3, b64;
-argv._.forEach(function (pattern) {
+let allMockList = [];
+let mathjax3, b64;
+argv._.forEach((pattern) => {
     if (pattern === 'b64') {
         b64 = true;
     } else if (pattern === 'mathjax3') {
         mathjax3 = true;
     } else {
-        var mockList = getMockList(pattern);
+        const mockList = getMockList(pattern);
 
         if (mockList.length === 0) {
-            throw new Error('No mocks found with pattern ' + pattern);
+            throw new Error(`No mocks found with pattern ${pattern}`);
         }
 
         allMockList = allMockList.concat(mockList);
     }
 });
 
-if (mathjax3) {
-    allMockList = [
-        'legend_mathjax_title_and_items',
-        'mathjax',
-        'parcats_grid_subplots',
-        'table_latex_multitrace_scatter',
-        'table_plain_birds',
-        'table_wrapped_birds',
-        'ternary-mathjax',
-        'ternary-mathjax-title-place-subtitle'
-    ];
-}
-
+if (mathjax3) allMockList = collections.mathjax3;
 if (allMockList.length) console.log(allMockList);
 console.log('Please wait for the process to complete.');
 
-var p = spawn('python3', [
+const p = spawn('python3', [
     path.join('test', 'image', 'make_baseline.py'),
-    (mathjax3 ? 'mathjax3' : '') + (b64 ? 'b64' : '') + '= ' + allMockList.join(' ')
+    `${mathjax3 ? 'mathjax3' : ''}${b64 ? 'b64' : ''}= ${allMockList.join(' ')}`
 ]);
 try {
-    p.stdout.on('data', function (data) {
+    p.stdout.on('data', (data) => {
         console.log(data.toString());
     });
 } catch (e) {
