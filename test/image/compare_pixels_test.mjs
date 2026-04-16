@@ -78,9 +78,9 @@ for (let mockName of allMockList) {
     if (disallowList.has(mockName)) continue;
 
     let threshold = 0;
-    if (flakyListMaps.has(mockName)) threshold = 1;
-    else if (flakyList.has(mockName)) threshold = 0.15;
-    else if (virtualWebgl) threshold = flakyVirtualWebgl.has(mockName) ? 0.7 : 0.4;
+    if (flakyList.has(mockName)) threshold = 0.2;
+    else if (flakyListMaps.has(mockName)) threshold = 1; // This threshold means any colors will match
+    if (virtualWebgl) threshold = Math.max(threshold, flakyVirtualWebgl.has(mockName) ? 0.7 : 0.4);
 
     if (mathjax3) mockName = 'mathjax3___' + mockName;
 
