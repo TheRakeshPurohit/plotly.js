@@ -33,21 +33,21 @@ var getMockList = require('./assets/get_mock_list');
  *
  *      npm run baseline b64
  *
-*/
+ */
 
 var argv = minimist(process.argv.slice(2), {});
 
 var allMockList = [];
 var mathjax3, b64;
-argv._.forEach(function(pattern) {
-    if(pattern === 'b64') {
+argv._.forEach(function (pattern) {
+    if (pattern === 'b64') {
         b64 = true;
-    } else if(pattern === 'mathjax3') {
+    } else if (pattern === 'mathjax3') {
         mathjax3 = true;
     } else {
         var mockList = getMockList(pattern);
 
-        if(mockList.length === 0) {
+        if (mockList.length === 0) {
             throw new Error('No mocks found with pattern ' + pattern);
         }
 
@@ -55,7 +55,7 @@ argv._.forEach(function(pattern) {
     }
 });
 
-if(mathjax3) {
+if (mathjax3) {
     allMockList = [
         'legend_mathjax_title_and_items',
         'mathjax',
@@ -68,22 +68,18 @@ if(mathjax3) {
     ];
 }
 
-if(allMockList.length) console.log(allMockList);
+if (allMockList.length) console.log(allMockList);
 console.log('Please wait for the process to complete.');
 
-var p = spawn(
-    'python3', [
-        path.join('test', 'image', 'make_baseline.py'),
-        (mathjax3 ? 'mathjax3' : '') +
-        (b64 ? 'b64' : '') +
-        '= ' + allMockList.join(' ')
-    ]
-);
+var p = spawn('python3', [
+    path.join('test', 'image', 'make_baseline.py'),
+    (mathjax3 ? 'mathjax3' : '') + (b64 ? 'b64' : '') + '= ' + allMockList.join(' ')
+]);
 try {
-    p.stdout.on('data', function(data) {
+    p.stdout.on('data', function (data) {
         console.log(data.toString());
     });
-} catch(e) {
+} catch (e) {
     console.error(e.stack);
     p.exit(1);
 }
