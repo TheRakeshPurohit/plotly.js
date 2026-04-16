@@ -108,7 +108,7 @@ case $1 in
         ;;
 
     make-baselines-mathjax3)
-        MATHJAX3_MOCKS=$(jq -r '.compare_mathjax3 | join(" ")' test/image/compare_pixels_collections.json)
+        MATHJAX3_MOCKS=$(jq -r '.mathjax3 | join(" ")' test/image/compare_pixels_collections.json)
         python test/image/make_baseline.py mathjax3 $MATHJAX3_MOCKS || EXIT_STATE=$?
         exit $EXIT_STATE
         ;;
