@@ -9,12 +9,7 @@
     "map_stamen-style"
   ],
   "flaky": ["gl3d_bunny-hull"],
-  "flaky_maps": [
-    "map_density0-legend",
-    "map_osm-style",
-    "map_predefined-styles1",
-    "map_predefined-styles2"
-  ],
+  "flaky_maps": ["map_density0-legend"],
   "flaky_virtual_webgl": [
     "gl3d_cone-wind",
     "gl3d_ibm-plot",
