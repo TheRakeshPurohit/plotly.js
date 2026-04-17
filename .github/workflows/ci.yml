@@ -325,6 +325,7 @@ jobs:
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload test-baselines image diffs
         if: failure()
         with:
           name: baselines-default-diff
@@ -381,6 +382,7 @@ jobs:
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload test-baselines-b64 image diffs
         if: failure()
         with:
           name: baselines-b64-diff
@@ -437,6 +439,7 @@ jobs:
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload test-baselines-virtual-webgl image diffs
         if: failure()
         with:
           name: baselines-virtual-webgl-diff
@@ -486,6 +489,7 @@ jobs:
           echo "Add the new images to 'test/image/baselines/' and commit them to this pull request."
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload test-baselines-mathjax3 image diffs
         if: failure()
         with:
           name: baselines-mathjax3-diff
@@ -536,6 +540,7 @@ jobs:
         run: node test/image/export_test.js
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()
+        name: Upload test-exports diffs
         with:
           name: exports-diff
           retention-days: 7
@@ -602,12 +607,14 @@ jobs:
 
       # Upload library uncompressed to allow for testing in REPLs
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload uncompressed plotly.js built from PR, using Node 22
         with:
-          retention-days: 7
+          retention-days: 30
           archive: false
           path: dist/plotly.js
       
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload Node 18 archive of plotly.js build folder
         with:
           name: dist-node18
           retention-days: 7
@@ -659,8 +666,9 @@ jobs:
 
       # Upload library uncompressed to allow for testing in REPLs
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload uncompressed plotly.js built from PR, using Node 22
         with:
-          retention-days: 7
+          retention-days: 30
           archive: false
           path: dist/plotly.node22.js
 
@@ -668,6 +676,7 @@ jobs:
         run: rm dist/plotly.node22.js
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload Node 22 archive of plotly.js build folder
         with:
           name: dist-node22
           retention-days: 7
@@ -707,6 +716,7 @@ jobs:
         run: diff --unified --color stackgl_modules/INDEX.js stackgl_modules/index.js
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload archive of stackgl_modules bundle
         if: failure()
         with:
           name: stackgl-bundle
@@ -737,6 +747,7 @@ jobs:
         run: diff -qr topojson/dist topojson/dist_backup
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        name: Upload archive of topojson files
         if: failure()
         with:
           name: topojson-dist
