@@ -4,6 +4,7 @@
     "map_fonts-supported-open-sans-weight",
     "map_fonts-supported-open-sans",
     "map_layers",
+    "map_osm-style",
     "map_predefined-styles2",
     "map_scattercluster",
     "map_stamen-style"
