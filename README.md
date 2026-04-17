@@ -1,7 +1,7 @@
 <a href="https://plotly.com/javascript/"><img src="https://images.plot.ly/logo/plotlyjs-logo@2x.png" height="70"></a>
 
 [![npm version](https://badge.fury.io/js/plotly.js.svg)](https://badge.fury.io/js/plotly.js)
-[![circle ci](https://circleci.com/gh/plotly/plotly.js.svg?style=shield)](https://circleci.com/gh/plotly/plotly.js)
+[![CI](https://github.com/plotly/plotly.js/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/plotly/plotly.js/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/plotly/plotly.js/blob/master/LICENSE)
 
 [Plotly.js](https://plotly.com/javascript) is a standalone JavaScript data visualization library, and it also powers the Python and R modules named `plotly` in those respective ecosystems (referred to as [Plotly.py](https://plotly.com/python) and [Plotly.R](http://plotly.com/r)).
