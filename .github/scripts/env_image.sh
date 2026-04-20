@@ -26,7 +26,7 @@ sudo cp -r .github/fonts/ /usr/share/
 sudo fc-cache -f
 
 # Install Kaleido & Plotly
-uv pip install --system kaleido==0.2.1 plotly==6.6.0 --no-progress
+uv pip install --system kaleido==1.2 plotly==6.6.0 --no-progress
 
 # Install numpy i.e. to convert arrays to typed arrays
 uv pip install --system numpy==2.4.3
