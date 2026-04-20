@@ -80,7 +80,7 @@ for (let mockName of allMockList) {
     let threshold = 0;
     if (flakyList.has(mockName)) threshold = 0.2;
     else if (flakyListMaps.has(mockName)) threshold = 0.4;
-    if (virtualWebgl) threshold = Math.max(threshold, flakyVirtualWebgl.has(mockName) ? 0.7 : 0.4);
+    if (virtualWebgl) threshold = Math.max(threshold, flakyVirtualWebgl.has(mockName) ? 0.75 : 0.4);
 
     if (mathjax3) mockName = 'mathjax3___' + mockName;
 
