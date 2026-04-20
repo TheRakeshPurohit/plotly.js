@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { execFileSync, spawn } from 'child_process';
 import { readFileSync } from 'fs';
 import minimist from 'minimist';
 import path from 'path';
@@ -61,15 +61,26 @@ if (mathjax3) allMockList = collections.mathjax3;
 if (allMockList.length) console.log(allMockList);
 console.log('Please wait for the process to complete.');
 
-const p = spawn('python3', [
+let cmd;
+let args = [];
+try {
+    execFileSync('uv', ['--version'], { stdio: 'ignore' });
+    cmd = 'uv';
+    args = ['run', 'python3'];
+} catch {
+    cmd = 'python3';
+}
+const p = spawn(cmd, [
+    ...args,
     path.join('test', 'image', 'make_baseline.py'),
     `${mathjax3 ? 'mathjax3' : ''}${b64 ? 'b64' : ''}= ${allMockList.join(' ')}`
 ]);
-try {
-    p.stdout.on('data', (data) => {
-        console.log(data.toString());
-    });
-} catch (e) {
-    console.error(e.stack);
-    p.exit(1);
-}
+p.stdout.on('data', (data) => {
+    process.stdout.write(data);
+});
+p.stderr.on('data', (data) => {
+    process.stderr.write(data);
+});
+p.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+});
