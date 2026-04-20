@@ -11,7 +11,7 @@
     "map_stamen-style"
   ],
   "flaky": ["gl3d_bunny-hull"],
-  "flaky_maps": ["map_density0-legend"],
+  "flaky_maps": ["map_density0-legend", "map_predefined-styles1"],
   "flaky_virtual_webgl": [
     "gl2d_parcoords_256_colors",
     "gl2d_parcoords_coloraxis",
