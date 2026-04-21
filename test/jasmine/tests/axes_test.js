@@ -1733,6 +1733,65 @@ describe('Test axes', function() {
         });
     });
 
+    describe('minallowed / maxallowed', function() {
+        // regression test for https://github.com/plotly/plotly.js/issues/7717
+        var gd;
+
+        beforeEach(function() { gd = createGraphDiv(); });
+        afterEach(destroyGraphDiv);
+
+        function expectForward(done, minallowed) {
+            Plotly.newPlot(gd, [{
+                x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                y: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }], {
+                xaxis: { minallowed: minallowed }
+            }).then(function() {
+                var r = gd._fullLayout.xaxis.range;
+                expect(r[0]).toBeLessThan(r[1], 'axis should not be reversed for minallowed=' + minallowed);
+                expect(r[0]).toBe(minallowed, 'axis min should be pinned at minallowed');
+            }).then(done, done.fail);
+        }
+
+        it('does not reverse axis when minallowed exceeds default range max', function(done) {
+            expectForward(done, 7);
+        });
+
+        it('does not reverse axis when minallowed equals default range max', function(done) {
+            expectForward(done, 6);
+        });
+
+        it('does not reverse axis when minallowed is well above default range max', function(done) {
+            expectForward(done, 100);
+        });
+
+        it('keeps explicit autorange:reversed even when minallowed is set', function(done) {
+            Plotly.newPlot(gd, [{
+                x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                y: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }], {
+                xaxis: { autorange: 'reversed', minallowed: 7 }
+            }).then(function() {
+                var r = gd._fullLayout.xaxis.range;
+                expect(r[0]).toBeGreaterThan(r[1], 'axis should remain reversed');
+                expect(r[1]).toBe(7, 'min slot (range[1] when reversed) should be minallowed');
+            }).then(done, done.fail);
+        });
+
+        it('does not reverse axis when maxallowed is below default range min', function(done) {
+            Plotly.newPlot(gd, [{
+                x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                y: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }], {
+                xaxis: { maxallowed: -2 }
+            }).then(function() {
+                var r = gd._fullLayout.xaxis.range;
+                expect(r[0]).toBeLessThan(r[1], 'axis should not be reversed');
+                expect(r[1]).toBe(-2, 'axis max should be pinned at maxallowed');
+            }).then(done, done.fail);
+        });
+    });
+
     describe('constraints relayout', function() {
         var gd;
 
