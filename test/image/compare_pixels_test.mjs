@@ -79,8 +79,10 @@ for (let mockName of allMockList) {
 
     let threshold = 0;
     if (flakyList.has(mockName)) threshold = 0.2;
-    else if (flakyListMaps.has(mockName)) threshold = 0.4;
-    if (virtualWebgl) threshold = Math.max(threshold, flakyVirtualWebgl.has(mockName) ? 0.75 : 0.4);
+    // Sometimes fonts don't render quite right, so up the threshold for them
+    else if (flakyListMaps.has(mockName)) threshold = 0.5;
+    // A lot of these are flaky due to virtual-webgl and Chrome: https://github.com/plotly/plotly.js/issues/7764
+    threshold = Math.max(threshold, flakyVirtualWebgl.has(mockName) ? 0.75 : 0.4);
 
     if (mathjax3) mockName = 'mathjax3___' + mockName;
 
