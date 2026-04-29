@@ -70,6 +70,11 @@ exports.throwOnError = function (err) {
     if (err) _throw(err);
 };
 
+exports.prependFile = (filePath, content) => {
+    const existing = fs.readFileSync(filePath, 'utf8');
+    fs.writeFileSync(filePath, content + existing);
+};
+
 exports.formatEnumeration = function (list) {
     var len = list.length;
 
