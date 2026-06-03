@@ -795,7 +795,7 @@ jobs:
               src/traces/scatterpolargl/regl_precompiled.js \
               src/traces/splom/regl_precompiled.js \
               src/traces/parcoords/regl_precompiled.js; then
-            echo "::error::Regl precompiled shaders are out of date. Download the 'regl-codegen' artifact from this workflow run and commit the updated files to this pull request."
+            echo "::error::Regl precompiled shaders are out of date. Download the 'regl-codegen' artifact from this workflow run, extract it into src/, and commit the updated files to this pull request."
             exit 1
           fi
 
