@@ -163,18 +163,53 @@ npm run schema
 #### Step 9: REGL - Review & commit potential changes to precompiled regl shaders
 
 If you are implementing a new feature that involves regl shaders, or if you are
-making changes that affect the usage of regl shaders, you would need to run
+making changes that affect the usage of regl shaders, you will need to regenerate the precompiled regl shader code. In practice, that means edits under:
 
-```bash
-npm run regl-codegen
-```
+- `src/traces/{scattergl,scatterpolargl,splom,parcoords}/`
+- `src/lib/prepare_regl.js`
+- `stackgl_modules/` (where the `regl-*` shader libs live)
+- `devtools/regl_codegen/`
 
-to regenerate the regl code. This will prompt you to open a browser window. This will then run through all
-traces with 'regl' in the tags, and store the captured code into 
-[src/generated/regl-codegen](https://github.com/plotly/plotly.js/blob/master/src/generated/regl-codegen). If no updates are necessary, it will be a no-op, but if there are changes, you will need to commit them.
+CI's `check-regl-codegen` job uses this same list as its trigger — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for the authoritative version.
 
 This is needed because regl performs codegen in runtime which breaks CSP
 compliance, and so for strict builds we pre-generate regl shader code here.
+
+The CI pipeline will automatically detect when regl-related files have changed and
+run the codegen process. If the precompiled shaders are out of date, the
+`check-regl-codegen` job will fail and upload a `regl-codegen` artifact containing
+the updated files. The artifact represents the full desired state of the codegen
+output (CI wipes the output directory before regenerating, so any orphaned shader
+files are pruned). To fix this:
+
+1. Download the `regl-codegen` artifact from the failed workflow run
+2. Delete `src/generated/regl-codegen/` in your working tree, then unzip the
+   artifact into `src/` so it replaces (rather than merges into) the existing
+   directory. Note that `actions/upload-artifact` strips the longest common
+   parent path from the uploaded paths, so the zip's root contains
+   `generated/regl-codegen/` and `traces/{scattergl,scatterpolargl,splom,parcoords}/regl_precompiled.js`
+   directly — extracting into `src/` restores the correct layout and
+   overwrites the four `regl_precompiled.js` files in one step.
+3. Commit and push the changes to your pull request
+
+Alternatively, you can regenerate the code locally:
+
+```bash
+rm -rf src/generated/regl-codegen/*
+npm run regl-codegen
+```
+
+The `rm -rf` step is needed to clean up any orphaned shader files left over from
+previous changes. `npm run regl-codegen` will prompt you to open
+a browser window, run through the mocks for each regl-using trace
+(`parcoords`, `scattergl`, `scatterpolargl`, `splom`), and store the captured
+shader code into
+[src/generated/regl-codegen](https://github.com/plotly/plotly.js/blob/master/src/generated/regl-codegen).
+The four `src/traces/{parcoords,scattergl,scatterpolargl,splom}/regl_precompiled.js`
+files are rewritten in the same pass so their imports point at the freshly
+generated shader files. Commit any changes that result — both the
+`src/generated/regl-codegen/` updates and any modified `regl_precompiled.js`
+files.
 
 #### Other npm scripts that may be of interest in development
 
