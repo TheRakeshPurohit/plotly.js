@@ -163,7 +163,7 @@ npm run schema
 #### Step 9: REGL - Review & commit potential changes to precompiled regl shaders
 
 If you are implementing a new feature that involves regl shaders, or if you are
-making changes that affect the usage of regl shaders, you would need to regenerate the precompiled regl shader code.
+making changes that affect the usage of regl shaders, you will need to regenerate the precompiled regl shader code.
 
 This is needed because regl performs codegen in runtime which breaks CSP
 compliance, and so for strict builds we pre-generate regl shader code here.

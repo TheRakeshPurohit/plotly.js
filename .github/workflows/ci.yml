@@ -43,6 +43,7 @@ jobs:
           if git diff --name-only "$BASE"...HEAD -- stackgl_modules/ | grep -q .; then
             echo "stackgl_modules=true" >> "$GITHUB_OUTPUT"
           fi
+          # If any of the directories listed below have changed, we need to re-run the regl-codegen step
           # stackgl_modules/ is listed here too because the regl-* shader libs live there;
           # changes can alter shader output and require regenerating the precompiled shaders.
           if git diff --name-only "$BASE"...HEAD -- src/traces/scattergl/ src/traces/scatterpolargl/ src/traces/splom/ src/traces/parcoords/ src/lib/prepare_regl.js stackgl_modules/ devtools/regl_codegen/ | grep -q .; then
