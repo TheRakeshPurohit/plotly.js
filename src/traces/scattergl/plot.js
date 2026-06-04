@@ -128,7 +128,10 @@ var exports = module.exports = function plot(gd, subplot, cdata) {
             scene.line2d.update(scene.lineOptions);
         }
         if(scene.error2d) {
-            var errorBatch = (scene.errorXOptions || []).concat(scene.errorYOptions || []);
+            var errorBatch = (scene.errorXOptions || []).concat(scene.errorYOptions || [])
+                .map(function(errorOptions) {
+                    return errorOptions || {positions: [], errors: []};
+                });
             scene.error2d.update(errorBatch);
         }
         if(scene.scatter2d) {
