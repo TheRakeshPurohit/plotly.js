@@ -239,7 +239,7 @@ plots.sendDataToCloud = function(gd) {
         // Only trust messages coming from the Cloud origin.
         if(event.origin !== cloudOrigin) return;
 
-        if(event.data && event.data.type === 'authenticated') {
+        if(event.data && event.data.type === 'CHART_AUTH_SUCCESS') {
             cloudWindow.postMessage({
                 type: 'chart',
                 chart: chart
