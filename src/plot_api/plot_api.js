@@ -2338,6 +2338,7 @@ var layoutUIControlPatterns = [
 
     { pattern: /^legend\.(x|y)$/, attr: 'editrevision' },
     { pattern: /^(shapes|annotations)/, attr: 'editrevision' },
+    { pattern: /^selections/, attr: 'selectionrevision' },
     { pattern: /^title\.text$/, attr: 'editrevision' }
 ];
 
