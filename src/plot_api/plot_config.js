@@ -275,8 +275,8 @@ var configAttributes = {
         description: [
             'Should we include a modebar button that sends this chart to a URL',
             'specified by `plotlyServerURL`, for sharing the chart with others?',
-            'Note that this button can (depending on `plotlyServerURL` being set)',
-            'send your data to an external server.'
+            'Note that this button will (after a confirmation step)',
+            'send chart data to an external server.'
         ].join(' ')
     },
     modeBarButtonsToRemove: {
