@@ -213,7 +213,7 @@ describe('Plotly.toImage', function () {
             })
             .then(function (d) {
                 expect(d.indexOf('data:image/')).toBe(-1);
-                expect(d.length).toBeWithin(32062, 1e3, 'svg image length');
+                expect(d.length).toBeWithin(32520, 1e3, 'svg image length');
             })
             .then(function () {
                 return Plotly.toImage(gd, { format: 'webp', imageDataOnly: true });
@@ -271,6 +271,54 @@ describe('Plotly.toImage', function () {
                 expect(img.height).toBe(450);
             })
             .then(done, done.fail);
+    });
+
+    describe('SVG export attribute escaping (XSS regression)', () => {
+        // Regression: pseudo-html style attributes encoded with numeric quote
+        // entities used to break out of the serialized SVG attribute context
+        // because htmlEntityDecode() ran after XMLSerializer and un-escaped
+        // &quot;. See src/snapshot/tosvg.js htmlEntityDecode.
+        const parser = new DOMParser();
+
+        const expectNoEventHandlerAttrs = (svg) => {
+            const doc = parser.parseFromString(svg, 'image/svg+xml');
+            const nodes = doc.getElementsByTagName('*');
+            for (const el of nodes) {
+                for (const attr of el.attributes) {
+                    const name = attr.name.toLowerCase();
+                    if (name.startsWith('on')) {
+                        fail(`parsed SVG has event-handler attribute <${el.nodeName} ${name}="${attr.value}">`);
+                    }
+                }
+            }
+        };
+
+        const runXssCase = (payload, done) => {
+            const fig = {
+                data: [{ x: [1], y: [1], type: 'scatter' }],
+                layout: { annotations: [{ x: 1, y: 1, showarrow: false, text: payload }] }
+            };
+
+            Plotly.newPlot(gd, fig)
+                .then(() => Plotly.toImage(gd, { format: 'svg', imageDataOnly: true }))
+                .then((svg) => expectNoEventHandlerAttrs(decodeURIComponent(svg)))
+                .then(done, done.fail);
+        };
+
+        it('should not let <span style=...> entity-encoded quotes escape attribute context', (done) => {
+            runXssCase('<span style="x:&#34; onmouseover=&#34;__xss=1&#34; a=&#34;">hi</span>', done);
+        });
+
+        it('should not let <a href=... style=...> entity-encoded quotes escape attribute context', (done) => {
+            runXssCase(
+                '<a href="https://example.com" style="x:&#34; onclick=&#34;__xss=1&#34; a=&#34;">click</a>',
+                done
+            );
+        });
+
+        it('should block &quot; (named) and &#x22; (hex) quote entities', (done) => {
+            runXssCase('<span style="x:&quot; onmouseover=&#x22;__xss=1&#x22; a=&quot;">hi</span>', done);
+        });
     });
 
     it('should work on pages with <base>', function (done) {
