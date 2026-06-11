@@ -24,6 +24,7 @@ var selectOnClick = require('../../components/selections').selectOnClick;
 
 var createGeoZoom = require('./zoom');
 var constants = require('./constants');
+var getFitboundsLonRange = require('./get_fitbounds_lon_range');
 
 var geoUtils = require('../../lib/geo_location_utils');
 var topojsonUtils = require('../../lib/topojson_utils');
@@ -232,6 +233,37 @@ proto.updateProjection = function(geoCalcData, fullLayout) {
         axLat._length = extent[1][1] - extent[0][1];
         axLon.range = getAutoRange(gd, axLon);
         axLat.range = getAutoRange(gd, axLat);
+
+        // For point data straddling the antimeridian (±180°), the naive [min, max]
+        // longitude range above can include a large empty span; prefer the compact
+        // crossing range instead. Skipped when a trace contributes region extents
+        // (choropleth or location-based scattergeo), whose geographic bounds are not
+        // captured by the point longitudes gathered here.
+        if(!this.hasChoropleth && geoLayout.fitbounds === 'locations') {
+            var lons = [];
+            var hasLocationData = false;
+
+            for(var i = 0; i < geoCalcData.length; i++) {
+                var calcTrace = geoCalcData[i];
+                var fitTrace = calcTrace[0].trace;
+
+                // only visible traces contribute to the autorange above
+                if(fitTrace.visible !== true) continue;
+                if(fitTrace.locations) {
+                    hasLocationData = true;
+                    break;
+                }
+                for(var j = 0; j < calcTrace.length; j++) {
+                    var lonlat = calcTrace[j].lonlat;
+                    if(lonlat) lons.push(lonlat[0]);
+                }
+            }
+
+            if(!hasLocationData) {
+                var fitLonRange = getFitboundsLonRange(lons);
+                if(fitLonRange) axLon.range = fitLonRange;
+            }
+        }
 
         var midLon = (axLon.range[0] + axLon.range[1]) / 2;
         var midLat = (axLat.range[0] + axLat.range[1]) / 2;
