@@ -271,7 +271,7 @@ var configAttributes = {
     },
     showSendToCloud: {
         valType: 'boolean',
-        dflt: true,
+        dflt: false,
         description: [
             'Should we include a modebar button that sends this chart to a URL',
             'specified by `plotlyServerURL`, for sharing the chart with others?',
