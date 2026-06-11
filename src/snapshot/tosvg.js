@@ -9,23 +9,39 @@ var Color = require('../components/color');
 var xmlnsNamespaces = require('../constants/xmlns_namespaces');
 var DOUBLEQUOTE_REGEX = /"/g;
 var DUMMY_SUB = 'TOBESTRIPPED';
-var DUMMY_REGEX = new RegExp('("' + DUMMY_SUB + ')|(' + DUMMY_SUB + '")', 'g');
+// Match TOBESTRIPPED adjacent to either a literal " or its entity form &quot;.
+// XMLSerializer escapes inner double-quotes to &quot; inside "-delimited
+// attributes, and htmlEntityDecode now preserves that entity for safety.
+const DUMMY_REGEX = new RegExp(`("${DUMMY_SUB})|(${DUMMY_SUB}")|(&quot;${DUMMY_SUB})|(${DUMMY_SUB}&quot;)`, 'g');
 
+// Entities for & " ' - decoding these in attribute context is an XSS vector,
+// so preserve them as-is. List includes named, decimal, and hex numeric forms.
+const PRESERVED_ENTITIES = ['&amp;', '&#38;', '&#x26;', '&quot;', '&#34;', '&#x22;', '&apos;', '&#39;', '&#x27;'];
+// Entities for < and > - normalize to numeric so downstream passes treat them
+// uniformly regardless of which form the serializer emitted.
+const LESS_THAN_ENTITIES = ['&lt;', '&#60;', '&#x3c;'];
+const GREATER_THAN_ENTITIES = ['&gt;', '&#62;', '&#x3e;'];
+
+/**
+ * Decode non-structural entities to Unicode for non-browser SVG renderers,
+ * keeping & " ' < > entity-encoded to prevent attribute-context escape (XSS).
+ *
+ * @param s - serialized SVG string
+ * @returns entity-normalized SVG string
+ */
 function htmlEntityDecode(s) {
-    var hiddenDiv = d3.select('body').append('div').style({ display: 'none' }).html('');
-    var replaced = s.replace(/(&[^;]*;)/gi, function (d) {
-        if (d === '&lt;') {
-            return '&#60;';
-        } // special handling for brackets
-        if (d === '&rt;') {
-            return '&#62;';
-        }
-        if (d.indexOf('<') !== -1 || d.indexOf('>') !== -1) {
-            return '';
-        }
+    const hiddenDiv = d3.select('body').append('div').style({ display: 'none' }).html('');
+    const replaced = s.replace(/(&[^;]*;)/gi, (d) => {
+        const lower = d.toLowerCase();
+        if (PRESERVED_ENTITIES.includes(lower)) return d;
+        if (LESS_THAN_ENTITIES.includes(lower)) return '&#60;';
+        if (GREATER_THAN_ENTITIES.includes(lower)) return '&#62;';
+        if (d.includes('<') || d.includes('>')) return '';
+
         return hiddenDiv.html(d).text(); // everything else, let the browser decode it to unicode
     });
     hiddenDiv.remove();
+
     return replaced;
 }
 
@@ -156,6 +172,7 @@ module.exports = function toSVG(gd, format, scale) {
     }
 
     var s = new window.XMLSerializer().serializeToString(svg.node());
+    // Decode numeric refs to Unicode so non-browser renderers (Batik, Illustrator) render them correctly.
     s = htmlEntityDecode(s);
     s = xmlEntityEncode(s);
 
