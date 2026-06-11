@@ -2,8 +2,7 @@
 
 var d3 = require('@plotly/d3');
 
-var Lib = require('../../lib');
-var _ = Lib._;
+var _ = require('../../lib')._;
 
 /**
  * Show a styled confirmation dialog before sharing a chart with Plotly Cloud.
