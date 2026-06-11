@@ -223,7 +223,7 @@ plots.sendDataToCloud = function(gd) {
 
     // Build the request body: the chart JSON plus the plotly.js version used to
     // generate it, so Cloud can host the chart with a compatible plotly.js version.
-    var chart = JSON.parse(plots.graphJson(gd, false, 'keepdata'));
+    var chart = plots.graphJson(gd, false, 'keepdata', 'object');
     chart.version = version;
 
     // Open the Cloud login page in a new tab. We keep a reference so we can post
@@ -231,7 +231,7 @@ plots.sendDataToCloud = function(gd) {
     var cloudWindow = window.open(baseUrl, '_blank');
     if(!cloudWindow) {
         console.error('Unable to open Plotly Cloud (the popup may have been blocked)');
-        gd.emit('plotly_afterexport');
+        gd.emit('plotly_exportfail');
         return;
     }
 
