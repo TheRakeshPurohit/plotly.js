@@ -261,7 +261,21 @@ proto.updateProjection = function(geoCalcData, fullLayout) {
 
             if(!hasLocationData) {
                 var fitLonRange = getFitboundsLonRange(lons);
-                if(fitLonRange) axLon.range = fitLonRange;
+                if(fitLonRange) {
+                    // getFitboundsLonRange returns a tight [min, max]. getAutoRange
+                    // pads the naive range (for marker size and the standard
+                    // margin), so scale that padding to the narrower crossing range
+                    // and apply it, keeping markers off the frame edge as on any
+                    // other fitbounds map. The padding is symmetric, so the
+                    // mid-longitude the projection centers on is unchanged.
+                    var lonDataSpan = Lib.aggNums(Math.max, null, lons) -
+                        Lib.aggNums(Math.min, null, lons);
+                    var lonPad = lonDataSpan > 0 ?
+                        (axLon.range[1] - axLon.range[0] - lonDataSpan) / 2 *
+                        (fitLonRange[1] - fitLonRange[0]) / lonDataSpan :
+                        0;
+                    axLon.range = [fitLonRange[0] - lonPad, fitLonRange[1] + lonPad];
+                }
             }
         }
 

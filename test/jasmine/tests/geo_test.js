@@ -83,11 +83,18 @@ describe('Test geo fitbounds with antimeridian-straddling points', function() {
 
     it('centers on the compact crossing view when points straddle the antimeridian', function(done) {
         // lon = [131.8855, -179] spans ~311deg the naive way; the compact view
-        // crosses the antimeridian, giving range [131.8855, 181] and a projection
-        // rotated to its mid-longitude (~156.4deg), not to the naive mid (~-24deg).
+        // crosses the antimeridian, giving a range around [131.8855, 181] (padded
+        // for markers like any fitbounds map) and a projection rotated to its
+        // mid-longitude (~156.4deg), not to the naive mid (~-24deg).
         _plot([131.8855, -179]).then(function() {
             var geoLayout = gd._fullLayout.geo;
-            expect(geoLayout.lonaxis._ax.range).toEqual([131.8855, 181]);
+            var lonRange = geoLayout.lonaxis._ax.range;
+            // crosses the antimeridian (upper bound past 180) and stays compact
+            // (~49deg plus a little padding), nowhere near the naive ~311deg.
+            expect(lonRange[0]).toBeLessThan(131.8855);
+            expect(lonRange[1]).toBeGreaterThan(181);
+            expect(lonRange[1] - lonRange[0]).toBeGreaterThan(49);
+            expect(lonRange[1] - lonRange[0]).toBeLessThan(70);
             expect(geoLayout._subplot.projection.rotate()[0]).toBeCloseTo(-156.4, 0);
         })
         .then(done, done.fail);
