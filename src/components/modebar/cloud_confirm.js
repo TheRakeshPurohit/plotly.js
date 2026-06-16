@@ -34,7 +34,7 @@ module.exports = function confirmCloudDialog(gd, serverUrl, onConfirm) {
 
     dialog.append('div')
         .classed('plotly-cloud-dialog-message', true)
-        .text(_(gd, 'Your chart data will be sent to') + ' ' + serverUrl + '.');
+        .text(_(gd, 'This chart and its data will be sent to') + ' ' + serverUrl + '.');
 
     var buttons = dialog.append('div')
         .classed('plotly-cloud-dialog-buttons', true);
