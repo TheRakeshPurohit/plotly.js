@@ -37,6 +37,7 @@ plots.fontAttrs = require('./font_attributes');
 plots.layoutAttributes = require('./layout_attributes');
 
 var commandModule = require('./command');
+const { server } = require('karma');
 plots.executeAPICommand = commandModule.executeAPICommand;
 plots.computeAPICommandBindings = commandModule.computeAPICommandBindings;
 plots.manageCommandObserver = commandModule.manageCommandObserver;
@@ -201,24 +202,7 @@ function positionPlayWithData(gd, container) {
     }
 }
 
-plots.sendDataToCloud = function(gd) {
-    var baseUrl = (window.PLOTLYENV || {}).BASE_URL || gd._context.plotlyServerURL;
-    if(!baseUrl) {
-        console.error('No destination URL provided (plotlyServerURL is not set)');
-        return;
-    }
-
-    // Plotly Cloud origin, used to validate incoming messages and to target outgoing ones.
-    // `baseUrl` (plotlyServerURL) is the upload page that handles login and signals
-    // back when authentication succeeds.
-    var cloudOrigin;
-    try {
-        cloudOrigin = new URL(baseUrl).origin;
-    } catch(e) {
-        console.error('Invalid plotlyServerURL: ' + baseUrl);
-        return;
-    }
-
+plots.sendDataToCloud = function(gd, serverURL) {
     gd.emit('plotly_beforeexport');
 
     // Build the request body: the chart JSON plus the plotly.js version used to
@@ -228,7 +212,7 @@ plots.sendDataToCloud = function(gd) {
 
     // Open the Cloud login page in a new tab. We keep a reference so we can post
     // the chart back to it once Cloud reports that authentication succeeded.
-    var cloudWindow = window.open(baseUrl, '_blank');
+    var cloudWindow = window.open(serverURL, '_blank');
     if(!cloudWindow) {
         console.error('Unable to open Plotly Cloud (the popup may have been blocked)');
         gd.emit('plotly_exportfail');
@@ -237,13 +221,13 @@ plots.sendDataToCloud = function(gd) {
 
     var handleMessage = function(event) {
         // Only trust messages coming from the Cloud origin.
-        if(event.origin !== cloudOrigin) return;
+        if(event.origin !== serverURL) return;
 
         if(event.data && event.data.type === 'CHART_AUTH_SUCCESS') {
             cloudWindow.postMessage({
                 type: 'chart',
                 chart: chart
-            }, cloudOrigin);
+            }, serverURL);
 
             window.removeEventListener('message', handleMessage);
             gd.emit('plotly_afterexport');
