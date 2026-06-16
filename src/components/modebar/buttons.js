@@ -80,6 +80,10 @@ modeBarButtons.sendChartToCloud = {
     }
 };
 
+// Alias to keep existing button name functional
+// TODO: Remove for 4.0
+modeBarButtons.sendDataToCloud = modeBarButtons.sendChartToCloud;
+
 modeBarButtons.zoom2d = {
     name: 'zoom2d',
     _cat: 'zoom',
