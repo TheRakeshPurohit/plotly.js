@@ -95,7 +95,7 @@ describe('Test geo fitbounds with antimeridian-straddling points', function() {
             expect(lonRange[1]).toBeGreaterThan(181);
             expect(lonRange[1] - lonRange[0]).toBeGreaterThan(49);
             expect(lonRange[1] - lonRange[0]).toBeLessThan(70);
-            expect(geoLayout._subplot.projection.rotate()[0]).toBeCloseTo(-156.4, 0);
+            expect(geoLayout._subplot.projection.rotate()[0]).toBeCloseTo(-156.44, 1);
         })
         .then(done, done.fail);
     });

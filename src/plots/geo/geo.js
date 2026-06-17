@@ -236,9 +236,10 @@ proto.updateProjection = function(geoCalcData, fullLayout) {
 
         // For point data straddling the antimeridian (±180°), the naive [min, max]
         // longitude range above can include a large empty span; prefer the compact
-        // crossing range instead. Skipped when a trace contributes region extents
-        // (choropleth or location-based scattergeo), whose geographic bounds are not
-        // captured by the point longitudes gathered here.
+        // crossing range instead. Restricted to fitbounds='locations' with no
+        // region-bearing traces: choropleth, scattergeo `locations`, and the
+        // geojson-bbox path used by fitbounds='geojson' + locationmode='geojson-id'
+        // all carry region extents that per-point lonlat centroids don't capture.
         if(!this.hasChoropleth && geoLayout.fitbounds === 'locations') {
             var lons = [];
             var hasLocationData = false;
@@ -249,7 +250,7 @@ proto.updateProjection = function(geoCalcData, fullLayout) {
 
                 // only visible traces contribute to the autorange above
                 if(fitTrace.visible !== true) continue;
-                if(fitTrace.locations) {
+                if(fitTrace.locations?.length) {
                     hasLocationData = true;
                     break;
                 }
