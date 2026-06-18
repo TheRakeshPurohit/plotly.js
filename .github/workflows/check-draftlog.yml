@@ -16,7 +16,7 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
@@ -58,7 +58,7 @@ jobs:
           MISSING_LINK=""
           while IFS= read -r f; do
             [ -z "$f" ] && continue
-            if ! grep -qE '\[\[#[0-9]+\]\(https://github\.com/plotly/plotly\.js/(pull|issues)/[0-9]+\)\]' "$f"; then
+            if ! grep -qE '\[\[#[0-9]+\]\(https://github\.com/plotly/plotly\.js/pull/[0-9]+\)\]' "$f"; then
               MISSING_LINK="$MISSING_LINK$f"$'\n'
             fi
           done <<< "$ADDED"
