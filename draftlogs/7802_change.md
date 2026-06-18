@@ -1,0 +1,2 @@
+- Update `sendDataToCloud` modebar button to upload chart to Plotly Cloud
+  - NOTE: The Plotly Cloud endpoint for receiving charts is not yet functional, so this button won't complete the upload.
