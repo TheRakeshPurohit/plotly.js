@@ -19,4 +19,15 @@ If your PR falls into more than one category - for example adding a new feature 
 which would render
  - Add `icicle` trace type [[#5546](https://github.com/plotly/plotly.js/pull/5546)]
 
-> Please start your single-line or multiple lined message with a verb. You could basically use the PR description while providing a link to the PR similar to the above example is appreciated too.
+> Please start your single-line or multiple lined message with a verb.
+
+Each entry must include a link back to the PR in the form shown above:
+`[[#1234](https://github.com/plotly/plotly.js/pull/1234)]` (a link to
+`/issues/1234` is also accepted, since GitHub redirects between the two).
+
+### Skipping the draftlog
+
+A CI check enforces that every pull request adds a new file under
+`draftlogs/`. If your PR genuinely does not warrant a CHANGELOG entry
+(e.g. a CI-only change, internal refactor, or docs typo), add the
+`no-draftlog` label to the PR to opt out.

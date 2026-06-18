@@ -71,6 +71,7 @@ We use the following [labels](https://github.com/plotly/plotly.js/labels) to tra
 | `status: in progress` | PRs that required some initial feedback but not ready to merge |
 | `status: reviewable` | PRs that are completed from the author's perspective |
 | `status: on hold` | PRs that are put on hold |
+| `no-draftlog` | PR opted out of the [draftlog](./draftlogs/README.md) check |
 
 ## Development
 
