@@ -520,45 +520,73 @@ describe('config argument', function() {
     });
 
     describe('plotlyServerURL:', function() {
-        let gd;
+        var gd;
+        var form;
 
-        beforeEach(() => { gd = createGraphDiv(); });
-        afterEach(destroyGraphDiv);
-
-        it('should default to an empty string', async() => {
-            await Plotly.newPlot(gd, [], {});
-            expect(gd._context.plotlyServerURL).toBe('');
-        });
-
-        it('can be configured via the config argument', async() => {
-            await Plotly.newPlot(gd, [], {}, { plotlyServerURL: 'https://cloud.plotly.com' });
-            expect(gd._context.plotlyServerURL).toBe('https://cloud.plotly.com');
-        });
-    });
-
-    describe('Plotly.Plots.sendDataToCloud', function() {
-        let gd;
-        let openSpy;
-
-        beforeEach(() => {
+        beforeEach(function() {
             gd = createGraphDiv();
-            openSpy = spyOn(window, 'open').and.returnValue({ postMessage: () => {} });
+            spyOn(HTMLFormElement.prototype, 'submit').and.callFake(function() {
+                form = this;
+            });
         });
+
         afterEach(destroyGraphDiv);
 
-        it('opens the given serverURL in a new tab', async() => {
-            await Plotly.newPlot(gd, [], {});
-            Plotly.Plots.sendDataToCloud(gd, 'https://cloud.plotly.com');
-            expect(openSpy).toHaveBeenCalledWith('https://cloud.plotly.com', '_blank');
+        it('should not default to an external plotly cloud', function(done) {
+            Plotly.newPlot(gd, [], {})
+            .then(function() {
+                expect(gd._context.plotlyServerURL).not.toBe('https://plot.ly');
+                expect(gd._context.plotlyServerURL).not.toBe('https://chart-studio.plotly.com');
+                expect(gd._context.plotlyServerURL).toBe('');
+
+                Plotly.Plots.sendDataToCloud(gd);
+                expect(form).toBe(undefined);
+            })
+            .then(done, done.fail);
         });
 
-        it('emits plotly_exportfail when the popup is blocked', async() => {
-            openSpy.and.returnValue(null);
-            let failed = false;
-            await Plotly.newPlot(gd, [], {});
-            gd.on('plotly_exportfail', () => { failed = true; });
-            Plotly.Plots.sendDataToCloud(gd, 'https://cloud.plotly.com');
-            expect(failed).toBe(true);
+        it('should be able to connect to Chart Studio Cloud when set to https://chart-studio.plotly.com', function(done) {
+            Plotly.newPlot(gd, [], {}, {
+                plotlyServerURL: 'https://chart-studio.plotly.com'
+            })
+            .then(function() {
+                expect(gd._context.plotlyServerURL).toBe('https://chart-studio.plotly.com');
+
+                Plotly.Plots.sendDataToCloud(gd);
+                expect(form.action).toBe('https://chart-studio.plotly.com/external');
+                expect(form.method).toBe('post');
+            })
+            .then(done, done.fail);
+        });
+
+        it('can be set to other base urls', function(done) {
+            Plotly.newPlot(gd, [], {}, {plotlyServerURL: 'dummy'})
+            .then(function() {
+                expect(gd._context.plotlyServerURL).toBe('dummy');
+
+                Plotly.Plots.sendDataToCloud(gd);
+                expect(form.action).toContain('/dummy/external');
+                expect(form.method).toBe('post');
+            })
+            .then(done, done.fail);
+        });
+
+        it('has lesser priotiy then window env', function(done) {
+            window.PLOTLYENV = {BASE_URL: 'yo'};
+
+            Plotly.newPlot(gd, [], {}, {plotlyServerURL: 'dummy'})
+            .then(function() {
+                expect(gd._context.plotlyServerURL).toBe('dummy');
+
+                Plotly.Plots.sendDataToCloud(gd);
+                expect(form.action).toContain('/yo/external');
+                expect(form.method).toBe('post');
+            })
+            .catch(failTest)
+            .then(function() {
+                delete window.PLOTLY_ENV;
+                done();
+            });
         });
     });
 
