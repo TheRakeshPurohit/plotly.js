@@ -823,21 +823,21 @@ describe('ModeBar', function() {
             gd._context.showEditInChartStudio = false;
             manageModeBar(gd);
             checkButtons(gd._fullLayout._modeBar, getButtons([
-                ['toImage', 'sendDataToCloud']
+                ['toImage', 'sendChartToCloud']
             ]), 1);
 
             gd._context.showSendToCloud = false;
             gd._context.showEditInChartStudio = true;
             manageModeBar(gd);
             checkButtons(gd._fullLayout._modeBar, getButtons([
-                ['toImage', 'editInChartStudio']
+                ['toImage', 'sendChartToCloud']
             ]), 1);
 
             gd._context.showSendToCloud = true;
             gd._context.showEditInChartStudio = true;
             manageModeBar(gd);
             checkButtons(gd._fullLayout._modeBar, getButtons([
-                ['toImage', 'editInChartStudio']
+                ['toImage', 'sendChartToCloud']
             ]), 1);
         });
 

@@ -146,6 +146,13 @@ function getButtonGroups(gd) {
     // buttons common to all plot types
     var commonGroup = ['toImage'];
     if(context.showSendToCloud) commonGroup.push('sendChartToCloud');
+    else if(context.showEditInChartStudio) {
+        console.warn([
+            '*showEditInChartStudio* is deprecated.',
+            'Use *showSendToCloud* instead.'
+        ].join(' '));
+        commonGroup.push('sendChartToCloud');
+    }
     addGroup(commonGroup);
 
     var zoomGroup = [];

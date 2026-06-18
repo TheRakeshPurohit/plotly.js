@@ -1,6 +1,7 @@
 var Plotly = require('../../../lib/index');
 var Plots = require('../../../src/plots/plots');
 var Lib = require('../../../src/lib');
+var modeBarButtons = require('../../../src/components/modebar/buttons');
 
 var d3Select = require('../../strict-d3').select;
 var createGraphDiv = require('../assets/create_graph_div');
@@ -522,69 +523,93 @@ describe('config argument', function() {
     describe('plotlyServerURL:', function() {
         var gd;
         var form;
+        var openSpy;
 
         beforeEach(function() {
             gd = createGraphDiv();
-            spyOn(HTMLFormElement.prototype, 'submit').and.callFake(function() {
-                form = this;
-            });
+            // sendDataToCloud hands off the chart by opening the provided URL in a
+            // new tab (window.open(url, '_blank')), so spy on window.open.
+            var cloudWindow = jasmine.createSpyObj('cloudWindow', ['postMessage']);
+            openSpy = spyOn(window, 'open').and.returnValue(cloudWindow);
         });
 
         afterEach(destroyGraphDiv);
 
-        it('should not default to an external plotly cloud', function(done) {
+        it('should default to an empty string', function(done) {
             Plotly.newPlot(gd, [], {})
             .then(function() {
                 expect(gd._context.plotlyServerURL).not.toBe('https://plot.ly');
                 expect(gd._context.plotlyServerURL).not.toBe('https://chart-studio.plotly.com');
                 expect(gd._context.plotlyServerURL).toBe('');
-
-                Plotly.Plots.sendDataToCloud(gd);
-                expect(form).toBe(undefined);
             })
             .then(done, done.fail);
         });
 
-        it('should be able to connect to Chart Studio Cloud when set to https://chart-studio.plotly.com', function(done) {
+        it('should open confirmation dialog when set to a correctly-formatted URL', function(done) {
             Plotly.newPlot(gd, [], {}, {
-                plotlyServerURL: 'https://chart-studio.plotly.com'
+                plotlyServerURL: 'https://example.plotly.com/endpoint'
             })
             .then(function() {
-                expect(gd._context.plotlyServerURL).toBe('https://chart-studio.plotly.com');
-
-                Plotly.Plots.sendDataToCloud(gd);
-                expect(form.action).toBe('https://chart-studio.plotly.com/external');
-                expect(form.method).toBe('post');
-            })
-            .then(done, done.fail);
-        });
-
-        it('can be set to other base urls', function(done) {
-            Plotly.newPlot(gd, [], {}, {plotlyServerURL: 'dummy'})
-            .then(function() {
-                expect(gd._context.plotlyServerURL).toBe('dummy');
-
-                Plotly.Plots.sendDataToCloud(gd);
-                expect(form.action).toContain('/dummy/external');
-                expect(form.method).toBe('post');
+                expect(gd._context.plotlyServerURL).toBe('https://example.plotly.com/endpoint');
+                modeBarButtons.sendChartToCloud.click(gd);
+                var msg = document.querySelector('.plotly-cloud-dialog-message');
+                expect(msg).not.toBe(null, 'confirmation dialog should be shown');
+                expect(msg.textContent).toContain('https://example.plotly.com/endpoint');
             })
             .then(done, done.fail);
         });
 
-        it('has lesser priotiy then window env', function(done) {
-            window.PLOTLYENV = {BASE_URL: 'yo'};
-
-            Plotly.newPlot(gd, [], {}, {plotlyServerURL: 'dummy'})
+        it('should NOT open confirmation dialog when set to an invalid URL', function(done) {
+            Plotly.newPlot(gd, [], {}, {
+                plotlyServerURL: 'dummy'
+            })
             .then(function() {
                 expect(gd._context.plotlyServerURL).toBe('dummy');
+                modeBarButtons.sendChartToCloud.click(gd);
+                var msg = document.querySelector('.plotly-cloud-dialog-message');
+                expect(msg).toBe(null, 'confirmation dialog should not be shown');
+            })
+            .then(done, done.fail);
+        });
 
-                Plotly.Plots.sendDataToCloud(gd);
-                expect(form.action).toContain('/yo/external');
-                expect(form.method).toBe('post');
+        it('should open URL in a new tab after clicking confirm button', function(done) {
+            Plotly.newPlot(gd, [], {}, {
+                plotlyServerURL: 'https://example.plotly.com/endpoint'
+            })
+            .then(function() {
+                expect(gd._context.plotlyServerURL).toBe('https://example.plotly.com/endpoint');
+                modeBarButtons.sendChartToCloud.click(gd);
+
+                // Click the confirm button in the dialog
+                var confirmBtn = document.querySelector('.plotly-cloud-dialog-btn--confirm');
+                expect(confirmBtn).not.toBe(null, 'confirm button should be shown');
+                mouseEvent('click', 0, 0, {element: confirmBtn});
+
+                // Should open the provided URL's origin in a new tab
+                expect(openSpy).toHaveBeenCalledWith('https://example.plotly.com/endpoint', '_blank');
+            })
+            .then(done, done.fail);
+        });
+
+        it('has lesser priority than window env', function(done) {
+            window.PLOTLYENV = {BASE_URL: 'https://yo.plotly.com/endpoint'};
+
+            Plotly.newPlot(gd, [], {}, {plotlyServerURL: 'https://example.plotly.com/endpoint2'})
+            .then(function() {
+                expect(gd._context.plotlyServerURL).toBe('https://example.plotly.com/endpoint2');
+
+                // Confirmation dialog message should contain window.PLOTLYENV.BASE_URL,
+                // which takes priority over plotlyServerURL
+                modeBarButtons.sendChartToCloud.click(gd);
+
+                var msg = document.querySelector('.plotly-cloud-dialog-message');
+                expect(msg).not.toBe(null, 'confirmation dialog should be shown');
+                expect(msg.textContent).toContain('https://yo.plotly.com/endpoint');
+                expect(msg.textContent).not.toContain('https://example.plotly.com/endpoint2');
             })
             .catch(failTest)
             .then(function() {
-                delete window.PLOTLY_ENV;
+                delete window.PLOTLYENV;
                 done();
             });
         });

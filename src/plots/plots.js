@@ -204,6 +204,8 @@ function positionPlayWithData(gd, container) {
 plots.sendDataToCloud = function(gd, serverURL) {
     gd.emit('plotly_beforeexport');
 
+    const serverURLOrigin = new URL(serverURL).origin;
+
     // Build the request body: the chart JSON plus the plotly.js version used to
     // generate it, so Cloud can host the chart with a compatible plotly.js version.
     var chart = plots.graphJson(gd, false, 'keepdata', 'object');
@@ -220,13 +222,13 @@ plots.sendDataToCloud = function(gd, serverURL) {
 
     var handleMessage = function(event) {
         // Only trust messages coming from the Cloud origin.
-        if(event.origin !== serverURL) return;
+        if(event.origin !== serverURLOrigin) return;
 
         if(event.data && event.data.type === 'CHART_AUTH_SUCCESS') {
             cloudWindow.postMessage({
                 type: 'chart',
                 chart: chart
-            }, serverURL);
+            }, serverURLOrigin);
 
             window.removeEventListener('message', handleMessage);
             gd.emit('plotly_afterexport');

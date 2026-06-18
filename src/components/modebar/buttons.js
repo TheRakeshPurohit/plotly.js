@@ -82,16 +82,15 @@ modeBarButtons.sendChartToCloud = {
         // Plotly Cloud origin, used to validate incoming messages and to target outgoing ones.
         // `baseUrl` (plotlyServerURL) is the upload page that handles login and signals
         // back when authentication succeeds.
-        var cloudOrigin;
         try {
-            cloudOrigin = new URL(baseUrl).origin;
+            new URL(baseUrl);
         } catch(e) {
             console.error('Invalid plotlyServerURL: ' + baseUrl);
             return;
         }
 
-        confirmCloudDialog(gd, serverUrl, function() {
-            Plots.sendDataToCloud(gd, cloudOrigin);
+        confirmCloudDialog(gd, baseUrl, function() {
+            Plots.sendDataToCloud(gd, baseUrl);
         });
     }
 };

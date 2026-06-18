@@ -279,6 +279,13 @@ var configAttributes = {
             'send chart data to an external server.'
         ].join(' ')
     },
+    showEditInChartStudio: {
+        valType: 'boolean',
+        dflt: false,
+        description: [
+            'Deprecated. Use `showSendToCloud` instead.'
+        ].join(' ')
+    },
     modeBarButtonsToRemove: {
         valType: 'any',
         dflt: [],
