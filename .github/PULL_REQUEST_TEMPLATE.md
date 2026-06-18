@@ -18,5 +18,5 @@ Before opening a pull request, developer should:
 7. select the _Allow edits from maintainers_ option (see this [article](https://help.github.com/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/) for more details).
 
 After opening a pull request, developer:
- - should create a new small markdown log file using the PR number e.g. `1010_fix.md` or `1010_add.md` inside `draftlogs` folder as described in this [README](https://github.com/plotly/plotly.js/blob/master/draftlogs/README.md), commit it and push.
+ - should create a new small markdown log file using the PR number e.g. `1010_fix.md` or `1010_add.md` inside `draftlogs` folder as described in this [README](https://github.com/plotly/plotly.js/blob/master/draftlogs/README.md), commit it and push. A CI check enforces this; PRs that don't warrant a CHANGELOG entry can opt out by applying the `no-draftlog` label.
  - should **not** force push (i.e. `git push -f`) to remote branches associated with opened pull requests. Force pushes make it hard for maintainers to keep track of updates. Therefore, if required, please fetch `upstream/master` and "merge" with master instead of "rebase".
