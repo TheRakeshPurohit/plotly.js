@@ -2210,7 +2210,9 @@ function numFormat(v, ax, fmtoverride, hover) {
             v = v.slice(0, Math.max(0, v.length + tickRound));
             for(var i = tickRound; i < 0; i++) v += '0';
         } else {
-            v = v.toFixed(Math.max(0, Math.min(20, tickRound))).replace(/\.?0+$/, '');
+            // subtract the half-epsilon added above so toFixed doesn't double-round
+            v -= e;
+            v = v.toFixed(Math.min(20, tickRound)).replace(/\.?0+$/, '');
         }
         // insert appropriate decimal point and thousands separator
         v = Lib.numSeparate(v, ax._separators, separatethousands);
