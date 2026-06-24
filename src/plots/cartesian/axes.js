@@ -2175,9 +2175,6 @@ function numFormat(v, ax, fmtoverride, hover) {
 
     if(tickformat) return ax._numFormat(tickformat)(v).replace(/-/g, MINUS_SIGN);
 
-    // 'epsilon' - rounding increment
-    var e = Math.pow(10, -tickRound) / 2;
-
     // exponentFormat codes:
     // 'e' (1.2e+6, default)
     // 'E' (1.2E+6)
@@ -2192,26 +2189,26 @@ function numFormat(v, ax, fmtoverride, hover) {
     // take the sign out, put it back manually at the end
     // - makes cases easier
     v = Math.abs(v);
+
+    // 'epsilon' - rounding increment
+    const e = Math.pow(10, -tickRound) / 2;
     if(v < e) {
         // 0 is just 0, but may get exponent if it's the last tick
         v = '0';
         isNeg = false;
     } else {
-        v += e;
         // take out a common exponent, if any
         if(exponent) {
             v *= Math.pow(10, -exponent);
             tickRound += exponent;
         }
         // round the mantissa
-        if(tickRound === 0) v = String(Math.floor(v));
-        else if(tickRound < 0) {
+        if(tickRound === 0) {
             v = String(Math.round(v));
-            v = v.slice(0, Math.max(0, v.length + tickRound));
-            for(var i = tickRound; i < 0; i++) v += '0';
+        } else if(tickRound < 0) {
+            const roundingMagnitude = Math.pow(10, -tickRound);
+            v = String(Math.round(v / roundingMagnitude) * roundingMagnitude);
         } else {
-            // subtract the half-epsilon added above so toFixed doesn't double-round
-            v -= e;
             v = v.toFixed(Math.min(20, tickRound)).replace(/\.?0+$/, '');
         }
         // insert appropriate decimal point and thousands separator
