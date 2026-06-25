@@ -2,7 +2,7 @@
 name: Chore
 about: Track maintenance work for plotly.js (dependency bumps, build/CI, internal refactors, docs)
 title: "[CHORE]: "
-labels: chore
+labels: "chore,plotly-internal"
 
 ---
 <!-- 
