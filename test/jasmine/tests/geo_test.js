@@ -4,6 +4,7 @@ var Lib = require('../../../src/lib');
 var Geo = require('../../../src/plots/geo');
 var GeoAssets = require('../../../src/assets/geo_assets');
 var constants = require('../../../src/plots/geo/constants');
+var getFitboundsLonRange = require('../../../src/plots/geo/get_fitbounds_lon_range');
 var geoLocationUtils = require('../../../src/lib/geo_location_utils');
 var topojsonUtils = require('../../../src/lib/topojson_utils');
 
@@ -35,6 +36,82 @@ function move(fromX, fromY, toX, toY, delay) {
         }, delay || DBLCLICKDELAY / 4);
     });
 }
+
+describe('Test geo fitbounds longitude range', function() {
+    it('returns the compact crossing range when point data straddles the antimeridian', function() {
+        expect(getFitboundsLonRange([131.8855, -179])).toEqual([131.8855, 181]);
+        expect(getFitboundsLonRange([170, 175, -170])).toEqual([170, 190]);
+    });
+
+    it('keeps the naive range (null) when the data does not straddle the antimeridian', function() {
+        expect(getFitboundsLonRange([131.8855, 179])).toBe(null);
+        expect(getFitboundsLonRange([-10, 0, 20])).toBe(null);
+    });
+
+    it('keeps the naive range (null) when the data spans the whole globe', function() {
+        var lons = [];
+        for(var lon = 0; lon <= 360; lon += 2.5) lons.push(lon);
+        expect(getFitboundsLonRange(lons)).toBe(null);
+    });
+
+    it('returns null when fewer than two finite longitudes are available', function() {
+        expect(getFitboundsLonRange([10])).toBe(null);
+        expect(getFitboundsLonRange([NaN, 5])).toBe(null);
+        expect(getFitboundsLonRange([])).toBe(null);
+    });
+});
+
+describe('Test geo fitbounds with antimeridian-straddling points', function() {
+    var gd;
+
+    beforeEach(function() { gd = createGraphDiv(); });
+
+    afterEach(destroyGraphDiv);
+
+    function _plot(lons) {
+        return Plotly.newPlot(gd, [{
+            type: 'scattergeo',
+            mode: 'markers',
+            lat: [43.1155, 32.7157],
+            lon: lons
+        }], {
+            geo: {fitbounds: 'locations', projection: {type: 'equirectangular'}},
+            width: 700,
+            height: 500
+        });
+    }
+
+    it('centers on the compact crossing view when points straddle the antimeridian', function(done) {
+        // lon = [131.8855, -179] spans ~311deg the naive way; the compact view
+        // crosses the antimeridian, giving a range around [131.8855, 181] (padded
+        // for markers like any fitbounds map) and a projection rotated to its
+        // mid-longitude (~156.4deg), not to the naive mid (~-24deg).
+        _plot([131.8855, -179]).then(function() {
+            var geoLayout = gd._fullLayout.geo;
+            var lonRange = geoLayout.lonaxis._ax.range;
+            // crosses the antimeridian (upper bound past 180) and stays compact
+            // (~49deg plus a little padding), nowhere near the naive ~311deg.
+            expect(lonRange[0]).toBeLessThan(131.8855);
+            expect(lonRange[1]).toBeGreaterThan(181);
+            expect(lonRange[1] - lonRange[0]).toBeGreaterThan(49);
+            expect(lonRange[1] - lonRange[0]).toBeLessThan(70);
+            expect(geoLayout._subplot.projection.rotate()[0]).toBeCloseTo(-156.44, 1);
+        })
+        .then(done, done.fail);
+    });
+
+    it('keeps the naive centering when points do not straddle the antimeridian', function(done) {
+        _plot([131.8855, 179]).then(function() {
+            var geoLayout = gd._fullLayout.geo;
+            // projection rotated to the naive mid-longitude (~155.4deg); the range is
+            // not wrapped across the antimeridian (which would rotate near -24deg or +156deg)
+            var rotateLon = geoLayout._subplot.projection.rotate()[0];
+            expect(rotateLon).toBeLessThan(-150);
+            expect(rotateLon).toBeGreaterThan(-160);
+        })
+        .then(done, done.fail);
+    });
+});
 
 describe('Test Geo layout defaults', function() {
     var layoutAttributes = Geo.layoutAttributes;

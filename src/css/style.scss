@@ -1,4 +1,5 @@
 @use "base";
+@use "cloud_dialog";
 @use "cursor";
 @use "modebar";
 @use "tooltip";
@@ -9,5 +10,6 @@
     @include cursor.styles;
     @include modebar.styles;
     @include tooltip.styles;
+    @include cloud_dialog.styles;
 }
 @include notifier.styles;

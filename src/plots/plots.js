@@ -6,6 +6,7 @@ var formatLocale = require('d3-format').formatLocale;
 var isNumeric = require('fast-isnumeric');
 var b64encode = require('base64-arraybuffer');
 
+var version = require('../version').version;
 var Registry = require('../registry');
 var PlotSchema = require('../plot_api/plot_schema');
 var Template = require('../plot_api/plot_template');
@@ -200,37 +201,42 @@ function positionPlayWithData(gd, container) {
     }
 }
 
-plots.sendDataToCloud = function(gd) {
-    var baseUrl = (window.PLOTLYENV || {}).BASE_URL || gd._context.plotlyServerURL;
-    if(!baseUrl) return;
-
+plots.sendDataToCloud = function(gd, serverURL) {
     gd.emit('plotly_beforeexport');
 
-    var hiddenformDiv = d3.select(gd)
-        .append('div')
-        .attr('id', 'hiddenform')
-        .style('display', 'none');
+    const serverURLOrigin = new URL(serverURL).origin;
 
-    var hiddenform = hiddenformDiv
-        .append('form')
-        .attr({
-            action: baseUrl + '/external',
-            method: 'post',
-            target: '_blank'
-        });
+    // Build the request body: the chart JSON plus the plotly.js version used to
+    // generate it, so Cloud can host the chart with a compatible plotly.js version.
+    var chart = plots.graphJson(gd, false, 'keepdata', 'object');
+    chart.version = version;
 
-    var hiddenformInput = hiddenform
-        .append('input')
-        .attr({
-            type: 'text',
-            name: 'data'
-        });
+    // Open the Cloud login page in a new tab. We keep a reference so we can post
+    // the chart back to it once Cloud reports that authentication succeeded.
+    var cloudWindow = window.open(serverURL, '_blank');
+    if(!cloudWindow) {
+        console.error('Unable to open Plotly Cloud (the popup may have been blocked)');
+        gd.emit('plotly_exportfail');
+        return;
+    }
 
-    hiddenformInput.node().value = plots.graphJson(gd, false, 'keepdata');
-    hiddenform.node().submit();
-    hiddenformDiv.remove();
+    var handleMessage = function(event) {
+        // Only trust messages coming from the Cloud origin.
+        if(event.origin !== serverURLOrigin) return;
 
-    gd.emit('plotly_afterexport');
+        if(event.data && event.data.type === 'CHART_AUTH_SUCCESS') {
+            cloudWindow.postMessage({
+                type: 'chart',
+                chart: chart
+            }, serverURLOrigin);
+
+            window.removeEventListener('message', handleMessage);
+            gd.emit('plotly_afterexport');
+        }
+    };
+
+    window.addEventListener('message', handleMessage);
+
     return false;
 };
 

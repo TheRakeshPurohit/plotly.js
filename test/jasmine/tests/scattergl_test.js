@@ -216,6 +216,77 @@ describe('end-to-end scattergl tests', function() {
         .then(done, done.fail);
     });
 
+    it('@gl should clear error bars when toggling traces with mixed error bars', function(done) {
+        function assertNoStaleErrorGroups(scene, msg) {
+            scene.error2d.groups.forEach(function(group, i) {
+                var hasSceneOptions = i < scene.count ?
+                    scene.errorXOptions[i] :
+                    scene.errorYOptions[i - scene.count];
+
+                if(!hasSceneOptions && group) {
+                    expect(group.count).toBe(0, msg + ': group ' + i);
+                }
+            });
+        }
+
+        function assertVisibleErrorBars(msg, exp) {
+            var scene = gd._fullLayout._plots.xy._scene;
+            var countSceneErrorYOptions = scene.errorYOptions.filter(function(opts) { return opts; }).length;
+            var countDrawableErrorGroups = scene.error2d.groups.filter(function(group) { return group && group.count; }).length;
+
+            expect(countSceneErrorYOptions).toBe(exp, msg + ' scene options');
+            expect(countDrawableErrorGroups).toBe(exp, msg + ' renderer groups');
+            assertNoStaleErrorGroups(scene, msg);
+        }
+
+        Plotly.newPlot(gd, [{
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'no error 1',
+            x: [0, 1, 2],
+            y: [0, 1, 0]
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'my',
+            x: [0, 1, 2],
+            y: [1, 2, 1],
+            error_y: {value: 0.2}
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'no error 2',
+            x: [0, 1, 2],
+            y: [2, 3, 2]
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'mz',
+            x: [0, 1, 2],
+            y: [3, 4, 3],
+            error_y: {value: 0.2}
+        }])
+        .then(function() {
+            assertVisibleErrorBars('base', 2);
+
+            return Plotly.restyle(gd, 'visible', 'legendonly', [3]);
+        })
+        .then(function() {
+            assertVisibleErrorBars('after hiding last error trace', 1);
+
+            return Plotly.restyle(gd, 'visible', true, [3]);
+        })
+        .then(function() {
+            assertVisibleErrorBars('after showing last error trace', 2);
+
+            return Plotly.restyle(gd, 'visible', 'legendonly', [1]);
+        })
+        .then(function() {
+            assertVisibleErrorBars('after hiding first error trace', 1);
+        })
+        .then(done, done.fail);
+    });
+
     it('@gl should change plot type with incomplete data', function(done) {
         Plotly.newPlot(gd, [{}])
         .then(function() {

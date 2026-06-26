@@ -1544,6 +1544,47 @@ describe('Plotly.react and uirevision attributes', function() {
         _run(fig, editSelection, checkNoSelection, checkSelection).then(done, done.fail);
     });
 
+    it('preserves layout selections using selectionrevision without logging unrecognized GUI edits', function(done) {
+        // Regression test for https://github.com/plotly/plotly.js/issues/7809
+        // Check that a box selection is correctly recognized by selectionrevision
+        // following a call to Plotly.react(), rather than notifying with an
+        // "unrecognized GUI edit: selections[0]..." error
+        function fig(mainRev, selectionRev) {
+            return {
+                data: [{y: [1, 3, 1]}, {y: [2, 1, 3]}],
+                layout: {
+                    uirevision: mainRev,
+                    selectionrevision: selectionRev,
+                    dragmode: 'select',
+                    width: 400,
+                    height: 400,
+                    margin: {l: 100, t: 100, r: 100, b: 100}
+                }
+            };
+        }
+
+        function editSelection() {
+            return drag({node: document.querySelector('.nsewdrag'), dpos: [148, 100], pos0: [150, 102]});
+        }
+
+        function checkNoSelection() {
+            expect((gd.layout.selections || []).length).toBe(0, 'layout.selections cleared');
+        }
+        function checkSelection() {
+            expect((gd.layout.selections || []).length).toBe(1, 'layout.selections preserved');
+        }
+
+        var warnings = [];
+        spyOn(Lib, 'warn').and.callFake(function(msg) { warnings.push(msg); });
+
+        _run(fig, editSelection, checkNoSelection, checkSelection).then(function() {
+            var guiEditWarnings = warnings.filter(function(msg) {
+                return String(msg).indexOf('unrecognized GUI edit') !== -1;
+            });
+            expect(guiEditWarnings).toEqual([], 'no unrecognized GUI edit warnings');
+        }).then(done, done.fail);
+    });
+
     it('preserves polar view changes using polar.uirevision', function(done) {
         // polar you can control either at the subplot or the axis level
         function fig(mainRev, polarRev) {
