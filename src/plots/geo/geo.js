@@ -24,9 +24,9 @@ var selectOnClick = require('../../components/selections').selectOnClick;
 
 var createGeoZoom = require('./zoom');
 var constants = require('./constants');
-var getFitboundsLonRange = require('./get_fitbounds_lon_range');
 
 var geoUtils = require('../../lib/geo_location_utils');
+var getFitboundsLonRange = geoUtils.getFitboundsLonRange;
 var topojsonUtils = require('../../lib/topojson_utils');
 var topojsonFeature = require('topojson-client').feature;
 

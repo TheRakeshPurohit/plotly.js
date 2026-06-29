@@ -381,11 +381,60 @@ function computeBbox(d) {
     return turfBbox(d);
 }
 
+/**
+ * Pick a compact longitude range for `fitbounds`-style auto-framing when the
+ * data straddles the antimeridian (±180°).
+ *
+ * Longitude is cyclic, so the naive [min, max] range used by the autorange
+ * machinery can include a large empty span when points sit on both sides of
+ * ±180° (e.g. lon = [131.8855, -179] spans ~311° the long way round, when the
+ * compact view spans ~49° across the antimeridian). This finds the largest gap
+ * between consecutive longitudes and, when that gap is wider than the gap across
+ * the antimeridian, returns the complementary range so the map shows the dense
+ * cluster of points rather than the empty ocean between them.
+ *
+ * The returned upper bound may exceed 180°; downstream `makeRangeBox` (and
+ * MapLibre's `LngLatBounds`) handle ranges that cross the antimeridian without
+ * ambiguity.
+ *
+ * @param {Array} lons - longitude values (may contain non-finite entries)
+ * @return {Array|null} [lonStart, lonEnd] when an antimeridian-crossing range is
+ *   more compact, otherwise null (caller keeps the autorange result).
+ */
+function getFitboundsLonRange(lons) {
+    const sorted = lons.filter(isFinite).sort((a, b) => a - b);
+    if (sorted.length < 2) return null;
+
+    const n = sorted.length;
+    const naiveSpan = sorted[n - 1] - sorted[0];
+    // Data already wraps the whole globe; there is nothing to compact.
+    if (naiveSpan >= 360) return null;
+
+    // Widest gap between consecutive longitudes.
+    let maxGap = -Infinity;
+    let gapStart = -1;
+    for (let i = 0; i < n - 1; i++) {
+        const gap = sorted[i + 1] - sorted[i];
+        if (gap > maxGap) {
+            maxGap = gap;
+            gapStart = i;
+        }
+    }
+
+    // Only worth wrapping when an interior gap is wider than the gap that the
+    // naive [min, max] range already leaves open across the antimeridian.
+    const antimeridianGap = 360 - naiveSpan;
+    if (maxGap <= antimeridianGap) return null;
+
+    return [sorted[gapStart + 1], sorted[gapStart] + 360];
+}
+
 module.exports = {
-    locationToFeature: locationToFeature,
-    feature2polygons: feature2polygons,
-    getTraceGeojson: getTraceGeojson,
-    extractTraceFeature: extractTraceFeature,
-    fetchTraceGeoData: fetchTraceGeoData,
-    computeBbox: computeBbox
+    locationToFeature,
+    feature2polygons,
+    getTraceGeojson,
+    extractTraceFeature,
+    fetchTraceGeoData,
+    computeBbox,
+    getFitboundsLonRange
 };
