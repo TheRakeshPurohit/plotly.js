@@ -26,8 +26,7 @@ var createGeoZoom = require('./zoom');
 var constants = require('./constants');
 
 var geoUtils = require('../../lib/geo_location_utils');
-var getFitboundsLonRange = geoUtils.getFitboundsLonRange;
-var unwrapLonRange = geoUtils.unwrapLonRange;
+const { getFitboundsLonRange, unwrapLonRange } = geoUtils;
 var topojsonUtils = require('../../lib/topojson_utils');
 var topojsonFeature = require('topojson-client').feature;
 

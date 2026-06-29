@@ -3,7 +3,7 @@
 var Lib = require('../../lib');
 var handleSubplotDefaults = require('../subplot_defaults');
 var getSubplotData = require('../get_data').getSubplotData;
-var unwrapLonRange = require('../../lib/geo_location_utils').unwrapLonRange;
+const { unwrapLonRange } = require('../../lib/geo_location_utils');
 
 var constants = require('./constants');
 var layoutAttributes = require('./layout_attributes');
