@@ -213,7 +213,11 @@ plots.sendDataToCloud = function(gd, serverURL) {
 
     // Open the Cloud login page in a new tab. We keep a reference so we can post
     // the chart back to it once Cloud reports that authentication succeeded.
-    var cloudWindow = window.open(serverURL, '_blank');
+    // Pass the current page's origin as a query string so Cloud knows where to
+    // send the CHART_AUTH_SUCCESS message back to.
+    var uploadUrl = new URL(serverURL);
+    uploadUrl.searchParams.set('origin', window.location.origin);
+    var cloudWindow = window.open(uploadUrl.href, '_blank');
     if(!cloudWindow) {
         console.error('Unable to open Plotly Cloud (the popup may have been blocked)');
         gd.emit('plotly_exportfail');
