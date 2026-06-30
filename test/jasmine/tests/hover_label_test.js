@@ -76,6 +76,31 @@ describe('Fx.hover:', function () {
             })
             .then(done, done.fail);
     });
+
+    it('populates xval/yval from calcdata when called with a pointNumber selection', (done) => {
+        // regression: array-mode dispatcher used to leave xval/yval undefined when
+        // the selection carried pointNumber, which crashed scattermap (NaN lonShift)
+        const data = [{ x: [10, 20, 30], y: [1, 2, 3] }];
+
+        Plotly.newPlot(gd, data)
+            .then(() => {
+                const traceModule = gd._fullData[0]._module;
+                let capturedArgs;
+                const originalHoverPoints = traceModule.hoverPoints;
+                spyOn(traceModule, 'hoverPoints').and.callFake((...args) => {
+                    capturedArgs = args;
+                    return originalHoverPoints(...args);
+                });
+
+                Plotly.Fx.hover(gd, [{ curveNumber: 0, pointNumber: 1 }]);
+
+                expect(traceModule.hoverPoints).toHaveBeenCalled();
+                // signature: hoverPoints(pointData, xval, yval, hovermode, opts)
+                expect(capturedArgs[1]).toBe(20, 'xval should match cd[1].x');
+                expect(capturedArgs[2]).toBe(2, 'yval should match cd[1].y');
+            })
+            .then(done, done.fail);
+    });
 });
 
 describe('hover info', function () {
