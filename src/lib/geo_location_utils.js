@@ -445,13 +445,19 @@ function getFitboundsLonRange(lons) {
 }
 
 /**
- * Return a monotonic version of a `[lon0, lon1]` longitude range so its
- * midpoint and span can be computed as if longitude were a regular linear
- * coordinate. When the range crosses the antimeridian (`lon0 > 0`, `lon1 < 0`)
- * `lon1` is shifted by +360°; otherwise the input pair is returned unchanged.
+ * Return an unwrapped version of a `[lon0, lon1]` longitude range.
+ * When the range crosses the antimeridian (`lon0 > 0`, `lon1 < 0`),
+ * 360 is added to `lon1` to produce a continuous range;
+ * otherwise the input pair is returned unchanged. Function assumes
+ * `lon0` is west of `lon1`.
  *
- * @param {[number, number]} lonRange - `[lon0, lon1]`, each in [-180, 180]
- * @return {[number, number]} the unwrapped range
+ * @example
+ *   unwrapLonRange([170, -170]) // → [170, 190]  (span = 20°, midpoint = 180°)
+ *   unwrapLonRange([-10, 20])   // → [-10, 20]   (no crossing, passthrough)
+ *
+ * @param {[number, number]} lonRange - `[lon0, lon1]`, each in the range [-180, 180]
+ * @return {[number, number]} The unwrapped range; when the input contract is
+ *   respected, `lon1` falls in the range `[lon0, lon0 + 360)`.
  */
 function unwrapLonRange([lon0, lon1]) {
     return [lon0, lon0 > 0 && lon1 < 0 ? lon1 + ANTIMERIDIAN_LON_SHIFT : lon1];
