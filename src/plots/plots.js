@@ -3190,7 +3190,7 @@ function sortAxisCategoriesByValue(axList, gd) {
 
                         // Skip points whose position is not a valid category
                         // (e.g. a null/NaN coordinate maps to BADNUM)
-                        if(!(catIndex + 1)) continue;
+                        if (catIndex == null || catIndex < 0) continue;
 
                         value = cdi.s;
                         if(value === undefined) value = cdi.v;
