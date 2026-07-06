@@ -3193,8 +3193,7 @@ function sortAxisCategoriesByValue(axList, gd) {
                         if(catIndex === undefined) catIndex = cdi[axLetter];
 
                         // Skip points whose position is not a valid category
-                        // (e.g. a null/NaN coordinate maps to BADNUM)
-                        if (catIndex == null || catIndex < 0) continue;
+                        if (isNaN(catIndex) || catIndex < 0) continue;
 
                         value = cdi.s;
                         if(value === undefined) value = cdi.v;
