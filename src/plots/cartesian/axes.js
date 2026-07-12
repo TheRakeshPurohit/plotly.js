@@ -90,6 +90,20 @@ function expandRange(range) {
     ];
 }
 
+// Correct a floating-point roundoff artefact. After repeated increments a tick
+// that should land exactly on tick0 can come out as e.g. -8.9e-17. The default
+// numeric tickformat rounds that away, but d3-format specs like `~r` render the
+// tiny value literally, so a tick at zero shows up as -0.0000000000000000888.
+// See https://github.com/plotly/plotly.js/issues/7765
+// When a value is far closer to tick0 than one dtick, snap it to exactly tick0.
+function snapToTick0(l, tick0l, dtick) {
+    if(isNumeric(dtick) && isNumeric(tick0l) && isNumeric(l) &&
+            l !== tick0l && Math.abs(l - tick0l) < Math.abs(dtick) * 1e-6) {
+        return tick0l;
+    }
+    return l;
+}
+
 /*
  * find the list of possible axes to reference with an xref or yref attribute
  * and coerce it to that list
@@ -1067,6 +1081,7 @@ axes.calcTicks = function calcTicks(ax, opts) {
         }
 
         var dtick = mockAx.dtick;
+        var tick0l = (type === 'linear') ? mockAx.r2l(mockAx.tick0) : undefined;
 
         if(mockAx.rangebreaks && mockAx._tick0Init !== mockAx.tick0) {
             // adjust tick0
@@ -1110,7 +1125,7 @@ axes.calcTicks = function calcTicks(ax, opts) {
             if(tickVals.length > maxTicks || x === prevX) break;
             prevX = x;
 
-            var obj = { value: x };
+            var obj = { value: snapToTick0(x, tick0l, dtick) };
 
             if(major) {
                 if(isDLog && (x !== (x | 0))) {
