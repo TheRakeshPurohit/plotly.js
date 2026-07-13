@@ -90,18 +90,26 @@ function expandRange(range) {
     ];
 }
 
-// Correct a floating-point roundoff artefact. After repeated increments a tick
-// that should land exactly on tick0 can come out as e.g. -8.9e-17. The default
-// numeric tickformat rounds that away, but d3-format specs like `~r` render the
-// tiny value literally, so a tick at zero shows up as -0.0000000000000000888.
-// See https://github.com/plotly/plotly.js/issues/7765
-// When a value is far closer to tick0 than one dtick, snap it to exactly tick0.
-function snapToTick0(l, tick0l, dtick) {
-    if(isNumeric(dtick) && isNumeric(tick0l) && isNumeric(l) &&
-            l !== tick0l && Math.abs(l - tick0l) < Math.abs(dtick) * 1e-6) {
-        return tick0l;
-    }
-    return l;
+/**
+ * Correct a floating-point roundoff artifact in a linearized tick value.
+ * When `l` is much closer to its nearest ideal grid position than one `dtick`
+ * (within `dtick * snapThreshold`), snap it to that ideal. Otherwise return
+ * `l` unchanged. See https://github.com/plotly/plotly.js/issues/7765.
+ *
+ * @param l - linearized tick value from the accumulator in calcTicks
+ * @param tick0l - the axis' `tick0` in linearized form
+ * @param dtick - the axis' tick step; must be numeric and nonzero to snap
+ * @returns the snapped value, or `l` unchanged if no snap applies
+ */
+function snapToGrid(l, tick0l, dtick) {
+    if (![dtick, l, tick0l].every(isNumeric) || dtick === 0) return l;
+
+    const nTicks = Math.round((l - tick0l) / dtick);
+    const idealTick = tick0l + nTicks * dtick;
+    const snapThreshold = 1e-6;
+    const shouldSnap = l !== idealTick && Math.abs(l - idealTick) < Math.abs(dtick) * snapThreshold;
+
+    return shouldSnap ? idealTick : l;
 }
 
 /*
@@ -1125,7 +1133,7 @@ axes.calcTicks = function calcTicks(ax, opts) {
             if(tickVals.length > maxTicks || x === prevX) break;
             prevX = x;
 
-            var obj = { value: snapToTick0(x, tick0l, dtick) };
+            var obj = { value: snapToGrid(x, tick0l, dtick) };
 
             if(major) {
                 if(isDLog && (x !== (x | 0))) {
