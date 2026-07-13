@@ -14,10 +14,7 @@ var Cartesian = require('../../../src/plots/cartesian');
 var Axes = require('../../../src/plots/cartesian/axes');
 var Fx = require('../../../src/components/fx');
 var supplyLayoutDefaults = require('../../../src/plots/cartesian/layout_defaults');
-var numerical = require('../../../src/constants/numerical');
-var BADNUM = numerical.BADNUM;
-var ONEDAY = numerical.ONEDAY;
-var ONEWEEK = numerical.ONEWEEK;
+const {BADNUM, MINUS_SIGN, ONEDAY, ONEWEEK} = require('../../../src/constants/numerical');
 
 var createGraphDiv = require('../assets/create_graph_div');
 var destroyGraphDiv = require('../assets/destroy_graph_div');
@@ -3500,6 +3497,50 @@ describe('Test axes', function() {
                 '1×10<sup>\u221216</sup>',
                 '1.1×10<sup>\u221216</sup>'
             ]);
+        });
+
+        it('snaps a near-zero tick to exactly tick0', () => {
+            const spec = {
+                type: 'linear',
+                tickmode: 'linear',
+                tick0: 0,
+                dtick: 0.2,
+                range: [-0.65, 0.65]
+            };
+
+            expect(mockCalc({ ...spec, tickformat: '~r' })).toEqual([
+                MINUS_SIGN + '0.6',
+                MINUS_SIGN + '0.4',
+                MINUS_SIGN + '0.2',
+                '0',
+                '0.2',
+                '0.4',
+                '0.6'
+            ]);
+
+            // the default numeric format was already fine; make sure it stays fine
+            expect(mockCalc(spec)).toEqual([
+                MINUS_SIGN + '0.6',
+                MINUS_SIGN + '0.4',
+                MINUS_SIGN + '0.2',
+                '0',
+                '0.2',
+                '0.4',
+                '0.6'
+            ]);
+        });
+
+        it('snaps ticks to non-tick0 grid positions', () => {
+            const textOut = mockCalc({
+                type: 'linear',
+                tickmode: 'linear',
+                tick0: 1,
+                dtick: 0.1,
+                range: [-0.05, 0.05],
+                tickformat: '~r'
+            });
+
+            expect(textOut).toEqual(['0']);
         });
 
         it('reverts to "power" for SI/B exponentformat beyond the prefix range (log case)', function() {
