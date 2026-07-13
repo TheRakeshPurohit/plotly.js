@@ -823,21 +823,21 @@ describe('ModeBar', function() {
             gd._context.showEditInChartStudio = false;
             manageModeBar(gd);
             checkButtons(gd._fullLayout._modeBar, getButtons([
-                ['toImage', 'sendDataToCloud']
+                ['toImage', 'sendChartToCloud']
             ]), 1);
 
             gd._context.showSendToCloud = false;
             gd._context.showEditInChartStudio = true;
             manageModeBar(gd);
             checkButtons(gd._fullLayout._modeBar, getButtons([
-                ['toImage', 'editInChartStudio']
+                ['toImage', 'sendChartToCloud']
             ]), 1);
 
             gd._context.showSendToCloud = true;
             gd._context.showEditInChartStudio = true;
             manageModeBar(gd);
             checkButtons(gd._fullLayout._modeBar, getButtons([
-                ['toImage', 'editInChartStudio']
+                ['toImage', 'sendChartToCloud']
             ]), 1);
         });
 
@@ -1040,7 +1040,7 @@ describe('ModeBar', function() {
             var actual = ax.range;
 
             if(ax.type === 'date') {
-                var truncate = function(v) { return v.substr(0, 10); };
+                var truncate = function(v) { return v.slice(0, 10); };
                 expect(actual.map(truncate)).toEqual(expected.map(truncate), axName);
             } else {
                 expect(actual).toBeCloseToArray(expected, PRECISION, axName);

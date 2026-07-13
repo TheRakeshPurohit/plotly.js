@@ -26,6 +26,7 @@ var createGeoZoom = require('./zoom');
 var constants = require('./constants');
 
 var geoUtils = require('../../lib/geo_location_utils');
+const { getFitboundsLonRange, unwrapLonRange } = geoUtils;
 var topojsonUtils = require('../../lib/topojson_utils');
 var topojsonFeature = require('topojson-client').feature;
 
@@ -232,6 +233,52 @@ proto.updateProjection = function(geoCalcData, fullLayout) {
         axLat._length = extent[1][1] - extent[0][1];
         axLon.range = getAutoRange(gd, axLon);
         axLat.range = getAutoRange(gd, axLat);
+
+        // For point data straddling the antimeridian (±180°), the naive [min, max]
+        // longitude range above can include a large empty span; prefer the compact
+        // crossing range instead. Restricted to fitbounds='locations' with no
+        // region-bearing traces: choropleth, scattergeo `locations`, and the
+        // geojson-bbox path used by fitbounds='geojson' + locationmode='geojson-id'
+        // all carry region extents that per-point lonlat centroids don't capture.
+        if(!this.hasChoropleth && geoLayout.fitbounds === 'locations') {
+            var lons = [];
+            var hasLocationData = false;
+
+            for(var i = 0; i < geoCalcData.length; i++) {
+                var calcTrace = geoCalcData[i];
+                var fitTrace = calcTrace[0].trace;
+
+                // only visible traces contribute to the autorange above
+                if(fitTrace.visible !== true) continue;
+                if(fitTrace.locations?.length) {
+                    hasLocationData = true;
+                    break;
+                }
+                for(var j = 0; j < calcTrace.length; j++) {
+                    var lonlat = calcTrace[j].lonlat;
+                    if(lonlat) lons.push(lonlat[0]);
+                }
+            }
+
+            if(!hasLocationData) {
+                var fitLonRange = getFitboundsLonRange(lons);
+                if(fitLonRange) {
+                    // getFitboundsLonRange returns a tight [min, max]. getAutoRange
+                    // pads the naive range (for marker size and the standard
+                    // margin), so scale that padding to the narrower crossing range
+                    // and apply it, keeping markers off the frame edge as on any
+                    // other fitbounds map. The padding is symmetric, so the
+                    // mid-longitude the projection centers on is unchanged.
+                    var lonDataSpan = Lib.aggNums(Math.max, null, lons) -
+                        Lib.aggNums(Math.min, null, lons);
+                    var lonPad = lonDataSpan > 0 ?
+                        (axLon.range[1] - axLon.range[0] - lonDataSpan) / 2 *
+                        (fitLonRange[1] - fitLonRange[0]) / lonDataSpan :
+                        0;
+                    axLon.range = [fitLonRange[0] - lonPad, fitLonRange[1] + lonPad];
+                }
+            }
+        }
 
         var midLon = (axLon.range[0] + axLon.range[1]) / 2;
         var midLat = (axLat.range[0] + axLat.range[1]) / 2;
@@ -780,13 +827,9 @@ function makeGraticule(axisName, geoLayout, fullLayout) {
 // Note that clipPad padding is added around range to avoid aliasing.
 function makeRangeBox(lon, lat) {
     var clipPad = constants.clipPad;
-    var lon0 = lon[0] + clipPad;
-    var lon1 = lon[1] - clipPad;
+    const [lon0, lon1] = unwrapLonRange([lon[0] + clipPad, lon[1] - clipPad]);
     var lat0 = lat[0] + clipPad;
     var lat1 = lat[1] - clipPad;
-
-    // to cross antimeridian w/o ambiguity
-    if(lon0 > 0 && lon1 < 0) lon1 += 360;
 
     var dlon4 = (lon1 - lon0) / 4;
 

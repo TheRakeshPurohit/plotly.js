@@ -9,6 +9,160 @@ To see all merged commits on the master branch that will be part of the next plo
 
 where X.Y.Z is the semver of most recent plotly.js release.
 
+## [3.7.0] -- 2026-07-03
+
+### Changed
+- Update `sendDataToCloud` modebar button to upload chart to Plotly Cloud [[#7802](https://github.com/plotly/plotly.js/pull/7802), [#7852](https://github.com/plotly/plotly.js/pull/7852), [#7854](https://github.com/plotly/plotly.js/pull/7854)]
+  - NOTE: The Plotly Cloud endpoint for receiving charts is not yet functional, so this button won't complete the upload.
+
+### Fixed
+- Fix stale `scattergl` error bars after toggling traces with mixed error bar visibility [[#7773](https://github.com/plotly/plotly.js/issues/7773)], with thanks to @JulienIcon for the contribution!
+- Fix "unrecognized GUI edit: selections[0]..." warnings emitted after making a box or lasso selection and then calling `Plotly.react()` [[#7836](https://github.com/plotly/plotly.js/issues/7836)]
+- Fix geo `fitbounds` to choose a compact longitude range when point data straddles the antimeridian [[#7837](https://github.com/plotly/plotly.js/pull/7837)], with thanks to @SharadhNaidu for the contribution!
+- Preserve XML structural entities during decode when exporting SVG [[#7838](https://github.com/plotly/plotly.js/pull/7838)]
+- Fix `Plotly.Fx.hover` crash on `scattermap` traces when called programmatically with a `pointNumber` selection [[#7882](https://github.com/plotly/plotly.js/pull/7882)]
+
+
+## [3.6.0] -- 2026-06-01
+
+### Added
+- Add support for arrays for the pie property `legendrank`, so that it can be configured per slice [[#7723](https://github.com/plotly/plotly.js/pull/7723)], with thanks to @my-tien for the contribution!
+- Add `hoversort` layout attribute to sort unified hover label items by value [[#7734](https://github.com/plotly/plotly.js/pull/7734)], with thanks to @kimsehwan96 for the contribution!
+
+### Fixed
+- Fix unexpected `ticklabelindex` behavior when minor ticks are not shown [[#7735](https://github.com/plotly/plotly.js/pull/7735)], with thanks to @my-tien for the contribution!
+- Fix issue where `hoveranywhere` / `clickanywhere` would not emit hover and click events over editable shapes [[#7788](https://github.com/plotly/plotly.js/pull/7788)]
+- Handle 'pixel' size mode for shape labels [[#7790](https://github.com/plotly/plotly.js/pull/7790)]
+- Update box plot defaults to fix issue with calling `Plotly.react` to switch from box to violin plot [[#7811](https://github.com/plotly/plotly.js/pull/7811)]
+- Include shapes with `legendgroup` specified when handling legend visibility toggling [[#7813](https://github.com/plotly/plotly.js/pull/7813)]
+
+
+## [3.5.1] -- 2026-05-01
+
+### Changed
+
+- Reduce NPM bundle size by removing unneeded files [[#7746](https://github.com/plotly/plotly.js/pull/7746)]
+
+### Fixed
+
+- Fix bug where certain `axis.minallowed` values could cause axis to be reversed [[#7761](https://github.com/plotly/plotly.js/pull/7761)]
+
+
+## [3.5.0] -- 2026-04-03
+
+### Added
+ - Add `hoveranywhere` and `clickanywhere` layout attributes to emit hover and click events anywhere in the plot area, not just over traces [[#7707](https://github.com/plotly/plotly.js/pull/7707)]
+ - Add `displayNotifier` configuration property to set the display of notifier in the top right area of the viewport [[#7730](https://github.com/plotly/plotly.js/pull/7730)], with thanks to @silversonicaxel for the contribution!
+- Update USA location lookup for `scattergeo` and `choropleth` traces to use both location names and abbreviations [[7731](https://github.com/plotly/plotly.js/pull/7731)]
+
+
+## [3.4.0] -- 2026-02-20
+
+### Added
+ - Add support for clicking legend titles to toggle visibility of all traces in legend [[#7698](https://github.com/plotly/plotly.js/pull/7698)]
+ - Add support for shapes to reference multiple axes [[#7666](https://github.com/plotly/plotly.js/pull/7666)]
+ - Add support for dashed marker lines in scatter plots [[#7673](https://github.com/plotly/plotly.js/pull/7673)], with thanks to @chrimaho for the contribution!
+
+### Changed
+- Increase axis autorange when bar charts have outside text labels, to avoid labels being clipped [[#7675](https://github.com/plotly/plotly.js/pull/7675)]
+
+### Fixed
+ - Fix issue where some traces in stacked area charts were not rendering their fill correctly after certain sequences of hide/show operations in the legend [[#7668](https://github.com/plotly/plotly.js/pull/7668)]
+ - Fix out of bounds index during scattergl animation trace type [[#7676](https://github.com/plotly/plotly.js/pull/7676)], with thanks to @BJohnBraddock for the contribution!
+
+
+## [3.3.1] -- 2025-12-12
+
+### Added
+- Add support for arrays for the pie properties `showlegend` and `legend`, so that these can be configured per slice. [[#7580](https://github.com/plotly/plotly.js/pull/7580)], with thanks to @my-tien for the contribution!
+
+### Changed
+ - Replace deprecated `String.substr()` with `String.slice()` [[#7662](https://github.com/plotly/plotly.js/pull/7662)], with thanks to @JBR-0100 for the contribution!
+
+
+## [3.3.0] -- 2025-11-14
+
+### Added
+- Add `hovertemplate` for `candlestick` and `ohlc` traces [[#7619](https://github.com/plotly/plotly.js/pull/7619)]
+- Generate list of ISO codes for provided topojson maps, update info for some disputed territories [[#7622](https://github.com/plotly/plotly.js/pull/7622)]
+
+### Changed
+- Turn off borders for plot container in CSS reset [[#7617](https://github.com/plotly/plotly.js/pull/7617)]
+
+### Fixed
+- Fix KDE sampling precision in violin trace to eliminate floating-point drift and prevent density underrun/overrun [[#7581](https://github.com/plotly/plotly.js/pull/7581)], with thanks to @Koookadooo for the contribution!
+
+
+## [3.2.0] -- 2025-10-30
+
+### Added
+- Add `hovertemplatefallback` and `texttemplatefallback` attributes [[#7577](https://github.com/plotly/plotly.js/pull/7577)]
+
+### Fixed
+- Fix wrong scrolling behavior for legend [[#7067](https://github.com/plotly/plotly.js/pull/7067)], with thanks to @Lexachoc for the contribution!
+- Fix bug affecting use of `customdata` with typed arrays [[#7608](https://github.com/plotly/plotly.js/pull/7608)]
+
+
+## [3.1.2] -- 2025-10-16
+
+### Added
+- Add "SI extended" formatting rule for tick exponents on axis labels, allowing values to be displayed with extended SI prefixes (e.g., femto, pico, atto) [[#7249](https://github.com/plotly/plotly.js/pull/7249)], with thanks to @dberardi99 for the contribution!
+
+### Fixed
+- Fix editable `title.text` for `ternary`, `polar`, `colorbar`, and `rangeslider` (regression introduced in 3.0.0) [[#7513](https://github.com/plotly/plotly.js/pull/7513)], with thanks to @Lexachoc for the contribution!
+- Fix `layout.title.subtitle` does not properly clear/remove from the chart when `subtitle` object is not in place, or `subtitle.text` set to `null`, empty string, or whitespace-only values [[#7571](https://github.com/plotly/plotly.js/pull/7571)], with thanks to @cminn10 for the contribution!
+- Fix issue where `visible` property of one legend was affecting another. [[#7574](https://github.com/plotly/plotly.js/pull/7574)]
+- Resolve incorrect shape clipping for domain-referenced shapes on n*10th subplot. [[#7576](https://github.com/plotly/plotly.js/pull/7576)]
+- Update config diff check method to handle nested arrays [[#7579](https://github.com/plotly/plotly.js/pull/7579)]
+
+
+## [3.1.1] -- 2025-09-29
+
+### Fixed
+- Update plot with all config changes during call to `Plotly.react` [[#7475](https://github.com/plotly/plotly.js/pull/7475)]
+- Fix wheel event handler `Violation` in Chromium by setting `passive: true` [[#7517](https://github.com/plotly/plotly.js/pull/7517)]
+- Fix `locationmode` warning to be less aggressive: show warning only when `locationmode` is `'country names'` [[#7520](https://github.com/plotly/plotly.js/pull/7520)]
+- Refactor `drawMainTitle` to use context-specific selections for title and subtitle, avoiding conflicts when multiple plots are present on the same page [[#7522](https://github.com/plotly/plotly.js/pull/7522)], with thanks to @davibarbosa2 for the contribution!
+- Fix broken styling of map attributions [[#7526](https://github.com/plotly/plotly.js/pull/7526)]
+- Calculate colorscale properly for histogram when marker `cmin`/`cmax`/`cmid` values are undefined [[#7534](https://github.com/plotly/plotly.js/pull/7534)]
+- Tidy up some stray characters in attribute descriptions [[#7539](https://github.com/plotly/plotly.js/pull/7539)], [[#7540](https://github.com/plotly/plotly.js/pull/7540)]
+- Fix some typos (and a conditional check) [[#7542](https://github.com/plotly/plotly.js/pull/7542)], with thanks to @musvaage for the contribution!
+- Fix cropping of subunits in USA topojson, clean up land and coastlines layers for all topojson [[#7555](https://github.com/plotly/plotly.js/pull/7555)]
+- Fix issue causing empty ScatterGL plots when using text elements [#7563](https://github.com/plotly/plotly.js/pull/7563)
+
+
+## [3.1.0]  -- 2025-08-08
+
+### Added
+- Add property `zerolinelayer` to cartesian axes to allow drawing zeroline above traces [[#7269](https://github.com/plotly/plotly.js/pull/7269)]
+- Add `pattern.path` attribute as an alternative to the preset `pattern.shape` values, so you can use any SVG path string as a pattern fill. [[#7280](https://github.com/plotly/plotly.js/pull/7280)]
+- Allow configuration of horizontal legend max height [[#7359](https://github.com/plotly/plotly.js/pull/7359)]
+- Add `modebardisable` attribute to cartesian axes, to allow fine control over which buttons affect which axes [[#7358](https://github.com/plotly/plotly.js/pull/7358)]
+- Add support for ticklabelposition "inside"/"outside" for category axes with `tickson` set to "boundaries" [[#7420](https://github.com/plotly/plotly.js/pull/7420)],
+with thanks to @my-tien for the contribution!
+- Add `unifiedhovertitle.text` to format unified hover titles [[#7439](https://github.com/plotly/plotly.js/pull/7439)]
+- Add `layout.hoverlabel.showarrow` (and `trace.hoverlabel.showarrow`) attribute to allow hiding the triangular caret that appears on the hover label box [[#7451](https://github.com/plotly/plotly.js/pull/7451)]
+- Add `minorloglabels` to cartesian axes [[#7468](https://github.com/plotly/plotly.js/pull/7468)]
+- Make modebar keyboard-accessible via tabbing [[#7492](https://github.com/plotly/plotly.js/pull/7492)], with thanks to @davidangarita1 for the contribution!
+
+### Changed
+- Switch to United Nations (coastlines, countries, land, ocean) + Natural Earth (lakes, rivers, subunits) geodata for building topojson used in geo plot [[#7393](https://github.com/plotly/plotly.js/pull/7393)]
+- Make 'png' all caps [[#7400](https://github.com/plotly/plotly.js/pull/7400)]
+- Refactor files related to UN topojson [[#7481](https://github.com/plotly/plotly.js/pull/7481)]
+- Update default `topojsonURL` to point to new UN topojson [[#7514](https://github.com/plotly/plotly.js/pull/7514)]
+- Add breaking change warning for *country names* `locationmode` option in choropleth, scattergeo plots [[#7514](https://github.com/plotly/plotly.js/pull/7514)]
+
+### Fixed
+- Fix performance warning in scattergl traces, [[#7390](https://github.com/plotly/plotly.js/pull/7390)], with thanks to @MzyzzG for the contribution!
+- Move css-loader and other dependencies into devDependencies section [[#7407](https://github.com/plotly/plotly.js/pull/7407)]
+- Fix hidden ticklabels taking up plot space [[#7417](https://github.com/plotly/plotly.js/pull/7417)]
+- Fix editable shapes (regression introduced in 2.34.0) [[#7470](https://github.com/plotly/plotly.js/pull/7470)],
+  with thanks to @my-tien for the contribution!
+- Update legend maxheight calculation logic [[#7483](https://github.com/plotly/plotly.js/pull/7483)] 
+- Fix hover event not triggered on consecutive empty bins (count=0) with `hovermode:'x'` for histogram [[#7503](https://github.com/plotly/plotly.js/pull/7503)], with thanks to @Lexachoc for the contribution!
+- Remove **form-data** nested dependency associated with [CVE-2025-7783](https://github.com/advisories/GHSA-fjxv-7rqg-78g4) [[#7514](https://github.com/plotly/plotly.js/pull/7514)], with thanks to @KyleBoyer for the contribution!
+
+
 ## [3.1.0-rc.1] -- 2025-08-01
 
 ### Added

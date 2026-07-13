@@ -128,7 +128,10 @@ var exports = module.exports = function plot(gd, subplot, cdata) {
             scene.line2d.update(scene.lineOptions);
         }
         if(scene.error2d) {
-            var errorBatch = (scene.errorXOptions || []).concat(scene.errorYOptions || []);
+            var errorBatch = (scene.errorXOptions || []).concat(scene.errorYOptions || [])
+                .map(function(errorOptions) {
+                    return errorOptions || {positions: [], errors: []};
+                });
             scene.error2d.update(errorBatch);
         }
         if(scene.scatter2d) {
@@ -263,8 +266,8 @@ var exports = module.exports = function plot(gd, subplot, cdata) {
     var isSelectMode = selectMode(dragmode);
     var clickSelectEnabled = fullLayout.clickmode.indexOf('select') > -1;
 
-    for(i = 0; i < count; i++) {
-        var cd0 = cdata[i][0];
+    for (const [cd0] of cdata) {
+        if (!cd0) continue;
         var trace = cd0.trace;
         var stash = cd0.t;
         var index = stash.index;

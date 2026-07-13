@@ -216,6 +216,77 @@ describe('end-to-end scattergl tests', function() {
         .then(done, done.fail);
     });
 
+    it('@gl should clear error bars when toggling traces with mixed error bars', function(done) {
+        function assertNoStaleErrorGroups(scene, msg) {
+            scene.error2d.groups.forEach(function(group, i) {
+                var hasSceneOptions = i < scene.count ?
+                    scene.errorXOptions[i] :
+                    scene.errorYOptions[i - scene.count];
+
+                if(!hasSceneOptions && group) {
+                    expect(group.count).toBe(0, msg + ': group ' + i);
+                }
+            });
+        }
+
+        function assertVisibleErrorBars(msg, exp) {
+            var scene = gd._fullLayout._plots.xy._scene;
+            var countSceneErrorYOptions = scene.errorYOptions.filter(function(opts) { return opts; }).length;
+            var countDrawableErrorGroups = scene.error2d.groups.filter(function(group) { return group && group.count; }).length;
+
+            expect(countSceneErrorYOptions).toBe(exp, msg + ' scene options');
+            expect(countDrawableErrorGroups).toBe(exp, msg + ' renderer groups');
+            assertNoStaleErrorGroups(scene, msg);
+        }
+
+        Plotly.newPlot(gd, [{
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'no error 1',
+            x: [0, 1, 2],
+            y: [0, 1, 0]
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'my',
+            x: [0, 1, 2],
+            y: [1, 2, 1],
+            error_y: {value: 0.2}
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'no error 2',
+            x: [0, 1, 2],
+            y: [2, 3, 2]
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            name: 'mz',
+            x: [0, 1, 2],
+            y: [3, 4, 3],
+            error_y: {value: 0.2}
+        }])
+        .then(function() {
+            assertVisibleErrorBars('base', 2);
+
+            return Plotly.restyle(gd, 'visible', 'legendonly', [3]);
+        })
+        .then(function() {
+            assertVisibleErrorBars('after hiding last error trace', 1);
+
+            return Plotly.restyle(gd, 'visible', true, [3]);
+        })
+        .then(function() {
+            assertVisibleErrorBars('after showing last error trace', 2);
+
+            return Plotly.restyle(gd, 'visible', 'legendonly', [1]);
+        })
+        .then(function() {
+            assertVisibleErrorBars('after hiding first error trace', 1);
+        })
+        .then(done, done.fail);
+    });
+
     it('@gl should change plot type with incomplete data', function(done) {
         Plotly.newPlot(gd, [{}])
         .then(function() {
@@ -545,6 +616,95 @@ describe('end-to-end scattergl tests', function() {
             expect(getSnap()).toEqual(TOO_MANY_POINTS + 1);
         }).then(done, done.fail);
     });
+
+    it('@gl should not throw when plot is called with a subset of scattergl calcdata', function (done) {
+        var layout = {
+            width: 300,
+            height: 300,
+            margin: { l: 0, r: 0, t: 0, b: 0 }
+        };
+        var config = { plotGlPixelRatio: 1 };
+
+        Plotly.newPlot(gd, [{
+            type: 'scattergl',
+            mode: 'lines',
+            x: [0, 1],
+            y: [0, 1],
+            line: { width: 10 }
+        }, {
+            type: 'scattergl',
+            mode: 'lines',
+            x: [0, 1],
+            y: [1, 0],
+            line: { width: 10 }
+        }], layout, config)
+            .then(function () {
+                var subplot = gd._fullLayout._plots.xy;
+                expect(subplot._scene.count).toBeGreaterThan(1);
+
+                expect(function () {
+                    ScatterGl.plot(gd, subplot, [gd.calcdata[1]]);
+                }).not.toThrow();
+            })
+            .then(done, done.fail);
+    });
+
+
+    it('@gl should not throw when animating frames redraw=true', function (done) {
+        var layout = {
+            width: 400,
+            height: 300,
+            margin: { l: 0, r: 0, t: 0, b: 0 },
+            xaxis: { range: [0, 30] },
+            yaxis: { range: [0, 900] }
+        };
+        var config = { plotGlPixelRatio: 1 };
+
+        function makeXY(n) {
+            var x = [];
+            var y = [];
+            for (var i = 0; i < n; i++) {
+                x.push(i);
+                y.push(i * i);
+            }
+            return { x: x, y: y };
+        }
+
+        var xy0 = makeXY(0);
+        var xy10 = makeXY(10);
+
+        var data = [{
+            type: 'scattergl',
+            mode: 'markers',
+            marker: { size: 5 },
+            x: xy10.x,
+            y: xy10.y
+        }];
+
+        var frames = [{
+            name: '0',
+            data: [{ x: xy0.x, y: xy0.y }]
+        }, {
+            name: '10',
+            data: [{ x: xy10.x, y: xy10.y }]
+        }];
+
+        Plotly.newPlot(gd, data, layout, config)
+            .then(function () {
+                return Plotly.addFrames(gd, frames);
+            })
+            .then(function () {
+                return Plotly.animate(gd, ['10'], {
+                    mode: 'immediate',
+                    frame: { duration: 0, redraw: true },
+                    transition: { duration: 0 }
+                });
+            })
+            .catch(failTest)
+            .then(done);
+    });
+
+
 });
 
 describe('Test scattergl autorange:', function() {

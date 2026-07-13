@@ -6,6 +6,7 @@ var formatLocale = require('d3-format').formatLocale;
 var isNumeric = require('fast-isnumeric');
 var b64encode = require('base64-arraybuffer');
 
+var version = require('../version').version;
 var Registry = require('../registry');
 var PlotSchema = require('../plot_api/plot_schema');
 var Template = require('../plot_api/plot_template');
@@ -200,37 +201,46 @@ function positionPlayWithData(gd, container) {
     }
 }
 
-plots.sendDataToCloud = function(gd) {
-    var baseUrl = (window.PLOTLYENV || {}).BASE_URL || gd._context.plotlyServerURL;
-    if(!baseUrl) return;
-
+plots.sendDataToCloud = function(gd, serverURL) {
     gd.emit('plotly_beforeexport');
 
-    var hiddenformDiv = d3.select(gd)
-        .append('div')
-        .attr('id', 'hiddenform')
-        .style('display', 'none');
+    const serverURLOrigin = new URL(serverURL).origin;
 
-    var hiddenform = hiddenformDiv
-        .append('form')
-        .attr({
-            action: baseUrl + '/external',
-            method: 'post',
-            target: '_blank'
-        });
+    // Build the request body: the chart JSON plus the plotly.js version used to
+    // generate it, so Cloud can host the chart with a compatible plotly.js version.
+    var chart = plots.graphJson(gd, false, 'keepdata', 'object');
+    chart.version = version;
 
-    var hiddenformInput = hiddenform
-        .append('input')
-        .attr({
-            type: 'text',
-            name: 'data'
-        });
+    // Open the Cloud login page in a new tab. We keep a reference so we can post
+    // the chart back to it once Cloud reports that authentication succeeded.
+    // Pass the current page's origin as a query string so Cloud knows where to
+    // send the CHART_AUTH_SUCCESS message back to.
+    var uploadUrl = new URL(serverURL);
+    uploadUrl.searchParams.set('origin', window.location.origin);
+    var cloudWindow = window.open(uploadUrl.href, '_blank');
+    if(!cloudWindow) {
+        console.error('Unable to open Plotly Cloud (the popup may have been blocked)');
+        gd.emit('plotly_exportfail');
+        return;
+    }
 
-    hiddenformInput.node().value = plots.graphJson(gd, false, 'keepdata');
-    hiddenform.node().submit();
-    hiddenformDiv.remove();
+    var handleMessage = function(event) {
+        // Only trust messages coming from the Cloud origin.
+        if(event.origin !== serverURLOrigin) return;
 
-    gd.emit('plotly_afterexport');
+        if(event.data && event.data.type === 'CHART_AUTH_SUCCESS') {
+            cloudWindow.postMessage({
+                type: 'chart',
+                chart: chart
+            }, serverURLOrigin);
+
+            window.removeEventListener('message', handleMessage);
+            gd.emit('plotly_afterexport');
+        }
+    };
+
+    window.addEventListener('message', handleMessage);
+
     return false;
 };
 
@@ -1254,13 +1264,17 @@ plots.supplyTraceDefaults = function(traceIn, traceOut, colorIndex, layout, trac
                 _module.attributes.showlegend ? _module.attributes : plots.attributes,
                 'showlegend'
             );
-
-            coerce('legend');
+            Lib.coerce(traceIn, traceOut,
+                _module.attributes.legend ? _module.attributes : plots.attributes,
+                'legend'
+            );
             coerce('legendwidth');
             coerce('legendgroup');
             coerce('legendgrouptitle.text');
-            coerce('legendrank');
-
+            Lib.coerce(traceIn, traceOut,
+                _module.attributes.legend ? _module.attributes : plots.attributes,
+                'legendrank'
+            );
             traceOut._dfltShowLegend = true;
         } else {
             traceOut._dfltShowLegend = false;
@@ -1450,7 +1464,7 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut, formatObj) {
 function getComputedSize(attr) {
     return (
         (typeof attr === 'string') &&
-        (attr.substr(attr.length - 2) === 'px') &&
+        (attr.slice(-2) === 'px') &&
         parseFloat(attr)
     );
 }
@@ -2099,7 +2113,7 @@ plots.graphJson = function(gd, dataonly, mode, output, useDefaults, includeConfi
                 // look for src/data matches and remove the appropriate one
                 if(mode === 'keepdata') {
                     // keepdata: remove all ...src tags
-                    if(v.substr(v.length - 3) === 'src') {
+                    if(v.slice(-3) === 'src') {
                         return;
                     }
                 } else if(mode === 'keepstream') {
@@ -3177,6 +3191,9 @@ function sortAxisCategoriesByValue(axList, gd) {
                         // For all other 2d cartesian traces
                         catIndex = cdi.p;
                         if(catIndex === undefined) catIndex = cdi[axLetter];
+
+                        // Skip points whose position is not a valid category
+                        if (isNaN(catIndex) || catIndex < 0) continue;
 
                         value = cdi.s;
                         if(value === undefined) value = cdi.v;

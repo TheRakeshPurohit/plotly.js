@@ -3,6 +3,7 @@
 var Lib = require('../../lib');
 var handleSubplotDefaults = require('../subplot_defaults');
 var getSubplotData = require('../get_data').getSubplotData;
+const { unwrapLonRange } = require('../../lib/geo_location_utils');
 
 var constants = require('./constants');
 var layoutAttributes = require('./layout_attributes');
@@ -73,7 +74,7 @@ function handleGeoDefaults(geoLayoutIn, geoLayoutOut, coerce, opts) {
             var dfltSpans = constants[axisName + 'Span'];
             var hSpan = (dfltSpans[projType] || dfltSpans['*']) / 2;
             var rot = coerce(
-                'projection.rotation.' + axisName.substr(0, 3),
+                'projection.rotation.' + axisName.slice(0, 3),
                 scopeParams.projRotate[i]
             );
             rangeDflt = [rot - hSpan, rot + hSpan];
@@ -108,10 +109,7 @@ function handleGeoDefaults(geoLayoutIn, geoLayoutOut, coerce, opts) {
     var lonRange = geoLayoutOut.lonaxis.range;
     var latRange = geoLayoutOut.lataxis.range;
 
-    // to cross antimeridian w/o ambiguity
-    var lon0 = lonRange[0];
-    var lon1 = lonRange[1];
-    if(lon0 > 0 && lon1 < 0) lon1 += 360;
+    const [lon0, lon1] = unwrapLonRange(lonRange);
 
     var centerLon = (lon0 + lon1) / 2;
     var projLon;

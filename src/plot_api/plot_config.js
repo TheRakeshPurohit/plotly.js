@@ -35,12 +35,8 @@ var configAttributes = {
         valType: 'string',
         dflt: '',
         description: [
-            'When set it determines base URL for',
-            'the \'Edit in Chart Studio\' `showEditInChartStudio`/`showSendToCloud` mode bar button',
-            'and the showLink/sendData on-graph link.',
-            'To enable sending your data to Chart Studio Cloud, you need to',
-            'set both `plotlyServerURL` to \'https://chart-studio.plotly.com\' and',
-            'also set `showSendToCloud` to true.'
+            'Sets the URL for the `sendChartToCloud` modebar button.',
+            'When clicked, the button will send the chart data to this URL.',
         ].join(' ')
     },
 
@@ -221,6 +217,12 @@ var configAttributes = {
         ].join(' ')
     },
 
+    displayNotifier: {
+        valType: 'boolean',
+        dflt: true,
+        description: 'Determines whether or not notifier is displayed.'
+    },
+
     showLink: {
         valType: 'boolean',
         dflt: false,
@@ -271,22 +273,17 @@ var configAttributes = {
         valType: 'boolean',
         dflt: false,
         description: [
-            'Should we include a ModeBar button, labeled "Edit in Chart Studio",',
-            'that sends this chart to chart-studio.plotly.com (formerly plot.ly) or another plotly server',
-            'as specified by `plotlyServerURL` for editing, export, etc? Prior to version 1.43.0',
-            'this button was included by default, now it is opt-in using this flag.',
-            'Note that this button can (depending on `plotlyServerURL` being set) send your data',
-            'to an external server. However that server does not persist your data',
-            'until you arrive at the Chart Studio and explicitly click "Save".'
+            'Should we include a modebar button that sends this chart to a URL',
+            'specified by `plotlyServerURL`, for sharing the chart with others?',
+            'Note that this button will (after a confirmation step)',
+            'send chart data to an external server.'
         ].join(' ')
     },
     showEditInChartStudio: {
         valType: 'boolean',
         dflt: false,
         description: [
-            'Same as `showSendToCloud`, but use a pencil icon instead of a floppy-disk.',
-            'Note that if both `showSendToCloud` and `showEditInChartStudio` are turned,',
-            'only `showEditInChartStudio` will be honored.'
+            'Deprecated. Use `showSendToCloud` instead.'
         ].join(' ')
     },
     modeBarButtonsToRemove: {
@@ -369,7 +366,8 @@ var configAttributes = {
     topojsonURL: {
         valType: 'string',
         noBlank: true,
-        dflt: 'https://cdn.plot.ly/',
+        // TODO: Switch the default back to 'https://cdn.plot.ly/' once we remove the legacy maps
+        dflt: 'https://cdn.plot.ly/un/',
         description: [
             'Set the URL to topojson used in geo charts.',
             'By default, the topojson files are fetched from cdn.plot.ly.',
