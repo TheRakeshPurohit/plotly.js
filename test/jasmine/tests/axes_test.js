@@ -3668,6 +3668,50 @@ describe('Test axes', function() {
             });
         });
 
+        it('formats tick labels correctly for small numbers in exponential notation', function() {
+            var textOut = mockCalc({
+                type: 'linear',
+                tickmode: 'linear',
+                exponentformat: 'none',
+                showexponent: 'all',
+                tick0: 0,
+                dtick: 1e-9,
+                range: [8.5e-9, 11.5e-9]
+            });
+
+            expect(textOut).toEqual([
+                '0.000000009', '0.00000001', '0.000000011'
+            ]);
+
+            textOut = mockCalc({
+                type: 'linear',
+                tickmode: 'linear',
+                exponentformat: 'none',
+                showexponent: 'all',
+                tick0: 0,
+                dtick: 1e-15,
+                range: [8.5e-15, 11.5e-15]
+            });
+
+            expect(textOut).toEqual([
+                '0.000000000000009', '0.00000000000001', '0.000000000000011'
+            ]);
+
+            textOut = mockCalc({
+                type: 'linear',
+                tickmode: 'linear',
+                exponentformat: 'e',
+                showexponent: 'all',
+                tick0: 0,
+                dtick: 1e-15,
+                range: [8.5e-15, 11.5e-15]
+            });
+
+            expect(textOut).toEqual([
+                '0.9e\u221214', '1e\u221214', '1.1e\u221214'
+            ]);
+        });
+
         it('provides a new date suffix whenever the suffix changes', function() {
             var ax = {
                 type: 'date',
