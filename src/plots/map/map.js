@@ -726,16 +726,14 @@ proto.addLayer = function(opts, below) {
 };
 
 // convenience method to project a [lon, lat] array to pixel coords
-proto.project = function(v) {
-    var map = this.map;
-    var lon = v[0];
-
-    if(map.getRenderWorldCopies()) {
-        var centerLon = map.getCenter().lng;
+proto.project = function ([lon, lat]) {
+    const map = this.map;
+    if (map.getRenderWorldCopies()) {
+        const centerLon = map.getCenter().lng;
         lon = centerLon + Lib.modHalf(lon - centerLon, 360);
     }
 
-    return map.project(new maplibregl.LngLat(lon, v[1]));
+    return map.project(new maplibregl.LngLat(lon, lat));
 };
 
 // get map's current view values in plotly.js notation
