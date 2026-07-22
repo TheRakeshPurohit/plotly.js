@@ -390,11 +390,13 @@ proto.createFramework = function(fullLayout) {
     // create mock x/y axes for hover routine
     self.xaxis = {
         _id: 'x',
-        c2p: function(v) { return self.project(v).x; }
+        c2p: function(v) { return self.project(v).x; },
+        _subplot: self
     };
     self.yaxis = {
         _id: 'y',
-        c2p: function(v) { return self.project(v).y; }
+        c2p: function(v) { return self.project(v).y; },
+        _subplot: self
     };
 
     self.updateFramework(fullLayout);
@@ -727,13 +729,7 @@ proto.addLayer = function(opts, below) {
 
 // convenience method to project a [lon, lat] array to pixel coords
 proto.project = function ([lon, lat]) {
-    const map = this.map;
-    if (map.getRenderWorldCopies()) {
-        const centerLon = map.getCenter().lng;
-        lon = centerLon + Lib.modHalf(lon - centerLon, 360);
-    }
-
-    return map.project(new maplibregl.LngLat(lon, lat));
+    return this.map.project(new maplibregl.LngLat(lon, lat));
 };
 
 // get map's current view values in plotly.js notation
