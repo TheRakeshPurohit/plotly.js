@@ -12,22 +12,22 @@ module.exports = function selectPoints(searchInfo, selectionTester) {
     var trace = cd[0].trace;
     var i;
 
-    if(!subtypes.hasMarkers(trace)) return [];
+    if (!subtypes.hasMarkers(trace)) return [];
 
-    if(selectionTester === false) {
-        for(i = 0; i < cd.length; i++) {
+    if (selectionTester === false) {
+        for (i = 0; i < cd.length; i++) {
             cd[i].selected = 0;
         }
     } else {
-        for(i = 0; i < cd.length; i++) {
+        for (i = 0; i < cd.length; i++) {
             var di = cd[i];
             var lonlat = di.lonlat;
 
-            if(lonlat[0] !== BADNUM) {
+            if (lonlat[0] !== BADNUM) {
                 var lonlat2 = [Lib.modHalf(lonlat[0], 360), lonlat[1]];
                 var xy = [xa.c2p(lonlat2), ya.c2p(lonlat2)];
 
-                if(selectionTester.contains(xy, null, i, searchInfo)) {
+                if (selectionTester.contains(xy, null, i, searchInfo)) {
                     selection.push({
                         pointNumber: i,
                         lon: lonlat[0],
